@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FC Newinn — Site Officiel</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* petit glow rouge discret */
+    .redGlow{
+      box-shadow: 0 0 0 1px rgba(239,68,68,.25), 0 0 40px rgba(239,68,68,.12);
+    }
+  </style>
+</head>
+
+<body class="bg-zinc-950 text-white">
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/75 backdrop-blur">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-11 w-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+          <img src="newinn_logo.png" alt="Logo FC Newinn" class="h-10 w-10 object-contain" />
+        </div>
+        <div>
+          <p class="font-black leading-none tracking-wide">FC <span class="text-red-500">NEWINN</span></p>
+          <p class="text-xs text-white/60">ABBSA • Division 3</p>
+        </div>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-2">
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition" onclick="goTo('home')">Accueil</button>
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition" onclick="goTo('players')">Joueurs</button>
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition" onclick="goTo('stats')">Stats</button>
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition" onclick="goTo('ranking')">Classement</button>
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition" onclick="goTo('calendar')">Calendrier</button>
+      </nav>
+
+      <button class="md:hidden px-3 py-2 rounded-xl bg-white/5 border border-white/10" onclick="toggleMenu()">☰</button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="hidden md:hidden border-t border-white/10">
+      <div class="mx-auto max-w-6xl px-4 py-3 flex flex-col gap-2">
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left" onclick="goTo('home')">Accueil</button>
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left" onclick="goTo('players')">Joueurs</button>
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left" onclick="goTo('stats')">Stats</button>
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left" onclick="goTo('ranking')">Classement</button>
+        <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left" onclick="goTo('calendar')">Calendrier</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="home" class="relative overflow-hidden">
+    <div class="absolute inset-0 opacity-45">
+      <div class="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-red-600 blur-[120px]"></div>
+      <div class="absolute top-10 right-0 h-96 w-96 rounded-full bg-white/10 blur-[120px]"></div>
+    </div>
+
+    <div class="relative mx-auto max-w-6xl px-4 py-14">
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+
+        <div>
+          <p class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/70">
+            🏟️ Club de Kraainem • Matchs à domicile : Rue au Bois 81, 1950 Kraainem
+          </p>
+
+          <h1 class="mt-4 text-4xl md:text-5xl font-black leading-tight">
+            FC <span class="text-red-500">NEWINN</span>
+          </h1>
+
+          <!-- ✅ Joli paragraphe de présentation -->
+          <p class="mt-4 text-white/70 max-w-xl leading-relaxed">
+            Le <span class="text-red-400 font-semibold">FC Newinn</span> est une équipe basée au <span class="font-semibold text-white">club de Kraainem</span>,
+            engagée en <span class="font-semibold text-white">ABBSA Division 3</span>. Notre identité repose sur l’intensité, le respect, et l’esprit d’équipe.
+            Les jours de match, on se retrouve à domicile au <span class="font-semibold text-white">Rue au Bois 81, 1950 Kraainem</span>,
+            avec une seule idée en tête : <span class="text-white font-semibold">jouer ensemble, gagner ensemble</span>.
+          </p>
+
+          <div class="mt-7 flex flex-wrap gap-3">
+            <button class="px-5 py-3 rounded-2xl bg-red-500 text-zinc-950 font-extrabold hover:brightness-110 transition"
+              onclick="goTo('players')">
+              Voir l’effectif
+            </button>
+
+            <button class="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/15 transition border border-white/10"
+              onclick="goTo('ranking')">
+              Voir le classement
+            </button>
+          </div>
+
+          <div class="mt-8 grid grid-cols-3 gap-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs text-white/60">Division</p>
+              <p class="font-extrabold">ABBSA D3</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs text-white/60">Localisation</p>
+              <p class="font-extrabold">Kraainem</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs text-white/60">Délégué</p>
+              <p class="font-extrabold">PASCHOLD</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bloc "match / stats rapides" -->
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-6 redGlow">
+          <div class="flex items-center justify-between">
+            <p class="font-black text-lg">Infos équipe</p>
+            <span class="text-xs text-white/60">Stats (à 0 pour l’instant)</span>
+          </div>
+
+          <div class="mt-5 rounded-3xl bg-zinc-950/60 border border-white/10 p-5">
+            <div class="flex items-center gap-4">
+              <div class="h-14 w-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                <img src="newinn_logo.png" alt="Logo FC Newinn" class="h-12 w-12 object-contain" />
+              </div>
+              <div>
+                <p class="text-white/60 text-sm">Équipe</p>
+                <p class="text-2xl font-black">NEW INN FC 1</p>
+              </div>
+            </div>
+
+            <div class="mt-4 text-white/70 text-sm">
+              Calendrier & scores à venir (dès que tu m’envoies les matchs ✅)
+            </div>
+          </div>
+
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs text-white/60">Buts</p>
+              <p class="text-xl font-black" id="teamGoals">0</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs text-white/60">Passes</p>
+              <p class="text-xl font-black" id="teamAssists">0</p>
+            </div>
+          </div>
+
+          <div class="mt-3 grid grid-cols-2 gap-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs text-white/60">Matchs joués</p>
+              <p class="text-xl font-black" id="teamPlayed">0</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs text-white/60">Bilan</p>
+              <p class="text-xl font-black" id="teamRecord">0V-0N-0D</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAYERS -->
+  <section id="players" class="mx-auto max-w-6xl px-4 py-12">
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <h2 class="text-2xl font-black">👥 Joueurs</h2>
+        <p class="text-white/60 mt-1">Effectif officiel du <span class="text-red-400 font-semibold">FC Newinn</span>.</p>
+      </div>
+      <div class="hidden md:block text-white/60 text-sm">Pas de numéros fixes ✅</div>
+    </div>
+
+    <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="playersGrid"></div>
+
+    <div class="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
+      <p class="font-black text-lg" id="playerName">Clique sur un joueur</p>
+      <p class="text-white/60 mt-2" id="playerInfo">Position + stats (actuellement à zéro).</p>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section id="stats" class="mx-auto max-w-6xl px-4 py-12">
+    <h2 class="text-2xl font-black">📊 Statistiques</h2>
+    <p class="text-white/60 mt-1">
+      Pour l’instant je mets <span class="font-semibold text-white">tout à 0</span>.
+      Quand tu me donnes tes matchs + buteurs/passeurs, je te fais un truc propre 🔥
+    </p>
+
+    <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4" id="statsBoxes"></div>
+  </section>
+
+  <!-- RANKING -->
+  <section id="ranking" class="mx-auto max-w-6xl px-4 py-12">
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <h2 class="text-2xl font-black">🏆 Classement — ABBSA Division 3</h2>
+        <p class="text-white/60 mt-1">
+          <span class="text-red-400 font-semibold">NEW INN FC 1</span> est mis en évidence.
+        </p>
+      </div>
+      <button class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 transition border border-white/10 text-sm"
+        onclick="refreshRanking()">
+        Mettre à jour (manuel)
+      </button>
+    </div>
+
+    <div class="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-zinc-950/50 border-b border-white/10">
+            <tr class="text-white/70">
+              <th class="text-left px-4 py-3">#</th>
+              <th class="text-left px-4 py-3">Équipe</th>
+              <th class="text-right px-4 py-3">J</th>
+              <th class="text-right px-4 py-3">G</th>
+              <th class="text-right px-4 py-3">P</th>
+              <th class="text-right px-4 py-3">N</th>
+              <th class="text-right px-4 py-3">BP</th>
+              <th class="text-right px-4 py-3">BC</th>
+              <th class="text-right px-4 py-3">Pts</th>
+            </tr>
+          </thead>
+          <tbody id="rankingBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="text-white/50 text-xs mt-3">
+      📝 Astuce : pour mettre à jour le classement, il suffit de modifier le tableau <span class="text-white/70 font-semibold">rankingData</span> dans le code.
+      Je t’explique juste après 😉
+    </p>
+  </section>
+
+  <!-- CALENDAR -->
+  <section id="calendar" class="mx-auto max-w-6xl px-4 py-12">
+    <h2 class="text-2xl font-black">🗓️ Calendrier & Scores</h2>
+    <p class="text-white/60 mt-1">Tu me l’envoies après et je l’intègre direct ✅</p>
+
+    <div class="mt-6 space-y-3" id="matchesList">
+      <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
+        <p class="font-black">Pas encore de calendrier</p>
+        <p class="text-white/60 mt-1 text-sm">
+          Dès que tu m’envoies les matchs (date + adversaire + score), je fais une section style “Match Center”.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-white/10 py-8 text-center text-white/50">
+    FC <span class="text-red-500 font-semibold">NEWINN</span> • Site vitrine ⚽
+  </footer>
+
+  <script>
+    const TEAM_NAME = "NEW INN FC 1";
+
+    // ✅ Joueurs + positions (stats à 0)
+    const players = [
+      { name: "Loic Vanderlinden", position: "Gardien", goals: 0, assists: 0 },
+      { name: "Baptiste Doupagne", position: "Gardien", goals: 0, assists: 0 },
+
+      { name: "Maxime Vanderlinden", position: "Défenseur", goals: 0, assists: 0 },
+      { name: "Noah Ceuppers", position: "Milieu / Défenseur", goals: 0, assists: 0 },
+      { name: "Emmanuel", position: "Défenseur", goals: 0, assists: 0 },
+      { name: "Sami Ouartan", position: "Défenseur", goals: 0, assists: 0 },
+      { name: "Sami (nom à ajouter)", position: "Défenseur", goals: 0, assists: 0 },
+      { name: "Rodolphe", position: "Défenseur", goals: 0, assists: 0 },
+      { name: "Matteo", position: "Défenseur", goals: 0, assists: 0 },
+      { name: "Polat", position: "Défenseur", goals: 0, assists: 0 },
+      { name: "Ariel", position: "Défenseur", goals: 0, assists: 0 },
+      { name: "Arthur Rollier", position: "Défenseur", goals: 0, assists: 0 },
+
+      { name: "Thomas Matthieu (Capitaine)", position: "Défenseur / Milieu", goals: 0, assists: 0 },
+
+      { name: "Adam", position: "Milieu", goals: 0, assists: 0 },
+      { name: "Theo Marchal", position: "Milieu", goals: 0, assists: 0 },
+      { name: "Julien Marchal", position: "Milieu", goals: 0, assists: 0 },
+      { name: "Audry Changoluiza", position: "Milieu", goals: 0, assists: 0 },
+
+      { name: "Romain Marchal", position: "Attaquant", goals: 0, assists: 0 },
+      { name: "Ahmed Alouini", position: "Attaquant", goals: 0, assists: 0 },
+      { name: "Jodel Kaze Ntibarufata", position: "Attaquant", goals: 0, assists: 0 },
+      { name: "Nolan", position: "Milieu / Attaquant", goals: 0, assists: 0 },
+      { name: "Diego Gomez", position: "Attaquant", goals: 0, assists: 0 },
+      { name: "Nolan", position: "Attaquant", goals: 0, assists: 0 },
+      { name: "Kevin Corrales", position: "Attaquant", goals: 0, assists: 0 },
+      { name: "Mohammed Amine Amara", position: "Attaquant", goals: 0, assists: 0 },
+    ];
+
+    // ✅ Classement (depuis ta capture)
+    const rankingData = [
+      { rank: 1, team: "MACCABI BXL", J: 15, G: 10, P: 4, N: 1, BP: 48, BC: 22, PTS: 31 },
+      { rank: 2, team: "CURTIS L'AUSELE", J: 15, G: 10, P: 5, N: 0, BP: 42, BC: 23, PTS: 30 },
+      { rank: 3, team: "CHIEFS WSL 2", J: 15, G: 8, P: 3, N: 4, BP: 42, BC: 33, PTS: 28 },
+      { rank: 4, team: "VOGELPIK FC.", J: 15, G: 8, P: 4, N: 3, BP: 27, BC: 23, PTS: 27 },
+      { rank: 5, team: "CHOULE AUDERGHEM 2", J: 14, G: 7, P: 3, N: 4, BP: 38, BC: 22, PTS: 25 },
+      { rank: 6, team: "IRLANDE FC 3", J: 15, G: 6, P: 4, N: 5, BP: 29, BC: 24, PTS: 23 },
+      { rank: 7, team: "SYB RFC", J: 14, G: 6, P: 5, N: 3, BP: 22, BC: 16, PTS: 21 },
+      { rank: 8, team: "GAST FC 1", J: 15, G: 5, P: 7, N: 3, BP: 26, BC: 42, PTS: 18 },
+      { rank: 9, team: "ITT - CLAUDY FC 1", J: 15, G: 4, P: 8, N: 3, BP: 26, BC: 41, PTS: 15 },
+      { rank: 10, team: "EXTRANOS (LOS)", J: 15, G: 3, P: 7, N: 5, BP: 28, BC: 37, PTS: 14 },
+      { rank: 11, team: "TRICOTEUSES FC.", J: 15, G: 3, P: 9, N: 4, BP: 21, BC: 29, PTS: 13 },
+      { rank: 12, team: "BRUSSELS BRITISH R 4", J: 15, G: 2, P: 9, N: 4, BP: 19, BC: 40, PTS: 10 },
+      { rank: 13, team: "NEW INN FC 1", J: 14, G: 2, P: 9, N: 3, BP: 18, BC: 44, PTS: 9 },
+      { rank: 14, team: "ASTURIAS SPORTING", J: 0, G: 0, P: 0, N: 0, BP: 0, BC: 0, PTS: 0 },
+    ];
+
+    // ---------- Navigation ----------
+    function goTo(id){
+      document.getElementById(id).scrollIntoView({behavior:"smooth"});
+      const menu = document.getElementById("mobileMenu");
+      if(!menu.classList.contains("hidden")) menu.classList.add("hidden");
+    }
+    function toggleMenu(){
+      document.getElementById("mobileMenu").classList.toggle("hidden");
+    }
+
+    // ---------- Render Joueurs ----------
+    function renderPlayers(){
+      const grid = document.getElementById("playersGrid");
+      grid.innerHTML = "";
+
+      players.forEach(p => {
+        const card = document.createElement("button");
+        card.className =
+          "text-left rounded-3xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition";
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between gap-3">
+            <p class="font-black text-base">${p.name}</p>
+            <span class="text-xs text-white/50">${p.position}</span>
+          </div>
+
+          <div class="mt-3 flex gap-2 text-xs text-white/70 flex-wrap">
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">${p.goals} ⚽</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">${p.assists} 🎯</span>
+          </div>
+        `;
+
+        card.onclick = () => {
+          document.getElementById("playerName").textContent = p.name;
+          document.getElementById("playerInfo").innerHTML = `
+            <span class="text-white/70">Position :</span> <span class="text-white font-semibold">${p.position}</span><br/>
+            <span class="text-white/70">Buts :</span> <span class="text-white font-semibold">${p.goals}</span><br/>
+            <span class="text-white/70">Passes :</span> <span class="text-white font-semibold">${p.assists}</span>
+          `;
+        };
+
+        grid.appendChild(card);
+      });
+    }
+
+    // ---------- Render Stats (tout à 0 pour le moment) ----------
+    function renderStats(){
+      const boxes = document.getElementById("statsBoxes");
+      boxes.innerHTML = `
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+          <p class="text-xs text-white/60">Matchs joués</p>
+          <p class="text-2xl font-black mt-1">0</p>
+        </div>
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+          <p class="text-xs text-white/60">Buts marqués</p>
+          <p class="text-2xl font-black mt-1">0</p>
+        </div>
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+          <p class="text-xs text-white/60">Passes décisives</p>
+          <p class="text-2xl font-black mt-1">0</p>
+        </div>
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+          <p class="text-xs text-white/60">Bilan</p>
+          <p class="text-2xl font-black mt-1">0V-0N-0D</p>
+        </div>
+      `;
+    }
+
+    // ---------- Render Classement ----------
+    function renderRanking(){
+      const body = document.getElementById("rankingBody");
+      body.innerHTML = "";
+
+      rankingData.forEach(row => {
+        const isUs = row.team.toUpperCase() === TEAM_NAME.toUpperCase();
+
+        const tr = document.createElement("tr");
+        tr.className =
+          "border-b border-white/10 " +
+          (isUs ? "bg-red-500/15" : "bg-transparent");
+
+        tr.innerHTML = `
+          <td class="px-4 py-3 ${isUs ? "font-black text-red-300" : "text-white/70"}">${row.rank}</td>
+          <td class="px-4 py-3 ${isUs ? "font-black text-red-200" : "font-semibold"}">
+            ${row.team}
+          </td>
+          <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.J}</td>
+          <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.G}</td>
+          <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.P}</td>
+          <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.N}</td>
+          <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BP}</td>
+          <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BC}</td>
+          <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.PTS}</td>
+        `;
+
+        body.appendChild(tr);
+      });
+    }
+
+    // bouton "mettre à jour" (pour l’instant il rerender juste)
+    function refreshRanking(){
+      renderRanking();
+    }
+
+    // init
+    renderPlayers();
+    renderStats();
+    renderRanking();
+  </script>
+
+</body>
+</html>
