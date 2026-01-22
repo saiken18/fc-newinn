@@ -13,6 +13,11 @@
     .redGlow{
       box-shadow: 0 0 0 1px rgba(239,68,68,.25), 0 0 40px rgba(239,68,68,.12);
     }
+     /* FIX dropdown select (options) */
+  select option{
+    background: #0a0a0a; /* fond sombre */
+    color: white;        /* texte blanc */
+  }
   </style>
 </head>
 
@@ -56,6 +61,7 @@
 
   <!-- HERO -->
   <section id="home" class="relative overflow-hidden">
+
     <div class="absolute inset-0 opacity-45">
       <div class="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-red-600 blur-[120px]"></div>
       <div class="absolute top-10 right-0 h-96 w-96 rounded-full bg-white/10 blur-[120px]"></div>
@@ -80,6 +86,39 @@
             Les jours de match, on se retrouve à domicile au <span class="font-semibold text-white">Rue au Bois 81, 1950 Kraainem</span>,
             avec une seule idée en tête : <span class="text-white font-semibold">jouer ensemble, gagner ensemble</span>.
           </p>
+          <!-- PROCHAIN MATCH -->
+<div class="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6 max-w-xl">
+  <p class="text-white/60 text-xs mb-2">Prochain match</p>
+
+  <p class="text-xl font-black">
+    NEW INN FC 1 <span class="text-white/40">vs</span> CHIEFS WSL 2
+  </p>
+
+  <p class="text-white/70 text-sm mt-2">
+    Samedi 24 janvier 2026 — 15:30
+  </p>
+
+  <p class="text-white/60 text-sm">
+    🏠 Domicile — Rue au Bois 81, 1950 Kraainem
+  </p>
+
+  <div class="mt-4 flex items-center gap-3">
+    <span
+      id="nmBadge"
+      class="inline-flex items-center rounded-full border border-white/10 bg-zinc-950/40 px-3 py-1 text-xs text-white/70"
+    >
+      J-?
+    </span>
+
+    <button
+      onclick="goTo('calendar')"
+      class="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-zinc-950 hover:brightness-110 transition"
+    >
+      Voir le calendrier
+    </button>
+  </div>
+</div>
+
 
           <div class="mt-7 flex flex-wrap gap-3">
             <button class="px-5 py-3 rounded-2xl bg-red-500 text-zinc-950 font-extrabold hover:brightness-110 transition"
@@ -496,6 +535,27 @@
     { day: 26, date: "2026-03-21", home: "SYB RFC", away: "TRICOTEUSES FC.", time: "15:30" },
     { day: 26, date: "2026-03-21", home: "ITT - CLAUDY FC 1", away: "CHIEFS WSL 2", time: "15:30" }
   ];
+  // --- PROCHAIN MATCH (badge J-...) ---
+function setNextMatchBadge(){
+  const badge = document.getElementById("nmBadge");
+  if(!badge) return;
+
+  // Prochain match que tu m'as donné : Journée 18, 24/01/2026 15:30
+  const next = new Date("2026-01-24T15:30:00");
+
+  const now = new Date();
+  const diffMs = next.getTime() - now.getTime();
+
+  // en jours (arrondi vers le bas)
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if(diffMs > 0){
+    badge.textContent = `J-${diffDays}`;
+  } else {
+    badge.textContent = `J+${Math.abs(diffDays)}`;
+  }
+}
+
 
   function goTo(id){
     document.getElementById(id).scrollIntoView({behavior:"smooth"});
@@ -706,6 +766,8 @@
   renderStats();
   renderRanking();
   renderMatches();
+  setNextMatchBadge();
+
 </script>
 
 </body>
