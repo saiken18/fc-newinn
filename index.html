@@ -236,16 +236,16 @@
   <!-- CALENDAR -->
   <section id="calendar" class="mx-auto max-w-6xl px-4 py-12">
     <h2 class="text-2xl font-black">🗓️ Calendrier & Scores</h2>
-    <p class="text-white/60 mt-1">Tu me l’envoies après et je l’intègre direct ✅</p>
+    <p class="text-white/60 mt-1">Sélectionne une journée pour voir les matchs</p>
+    <div class="mt-6 flex flex-col md:flex-row md:items-center gap-3">
+  <label class="text-white/60 text-sm">Choisir une journée :</label>
 
-    <div class="mt-6 space-y-3" id="matchesList">
-      <div class="rounded-3xl border border-white/10 bg-white/5 p-6">
-        <p class="font-black">Pas encore de calendrier</p>
-        <p class="text-white/60 mt-1 text-sm">
-          Dès que tu m’envoies les matchs (date + adversaire + score), je fais une section style “Match Center”.
-        </p>
-      </div>
-    </div>
+  <select id="daySelect"
+    class="w-full md:w-72 rounded-2xl bg-white/5 border border-white/10 px-4 py-3 text-white outline-none">
+  </select>
+</div>
+
+<div class="mt-4 space-y-3" id="matchesList"></div>
   </section>
 
   <footer class="border-t border-white/10 py-8 text-center text-white/50">
@@ -309,7 +309,8 @@
     { rank: 10, team: "EXTRANOS (LOS)", J: 15, G: 3, P: 7, N: 5, BP: 28, BC: 37, PTS: 14 },
     { rank: 11, team: "TRICOTEUSES FC.", J: 15, G: 3, P: 9, N: 4, BP: 21, BC: 29, PTS: 13 },
     { rank: 12, team: "BRUSSELS BRITISH R 4", J: 15, G: 2, P: 9, N: 4, BP: 19, BC: 40, PTS: 10 },
-    { rank: 13, team: "NEW INN FC 1", J: 14, G: 2, P: 9, N: 3, BP: 18, BC: 44, PTS: 9 }
+    { rank: 13, team: "NEW INN FC 1", J: 14, G: 2, P: 9, N: 3, BP: 18, BC: 44, PTS: 9 },
+    { rank: 14, team: "ASTURIAS SPORTING", J: 0, G: 0, P: 0, N: 0, BP: 0, BC: 0, PTS: 0, excluded: true }
   ];
 
   const matches = [
@@ -561,36 +562,37 @@
   }
 
   function renderStats(){
-    const boxes = document.getElementById("statsBoxes");
-    boxes.innerHTML = `
-      <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
-        <p class="text-xs text-white/60">Matchs joués</p>
-        <p class="text-2xl font-black mt-1">${teamInfo.played}</p>
-      </div>
-      <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
-        <p class="text-xs text-white/60">Passes décisives</p>
-        <p class="text-2xl font-black mt-1">${teamInfo.assists}</p>
-      </div>
-      <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
-        <p class="text-xs text-white/60">Buts encaissés</p>
-        <p class="text-2xl font-black mt-1">${teamInfo.conceded}</p>
-      </div>
-      <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
-        <p class="text-xs text-white/60">Bilan</p>
-        <p class="text-2xl font-black mt-1">${teamInfo.record}</p>
-      </div>
-    `;
+  const boxes = document.getElementById("statsBoxes");
+  boxes.innerHTML = `
+    <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+      <p class="text-xs text-white/60">Matchs joués</p>
+      <p class="text-2xl font-black mt-1">${teamInfo.played}</p>
+    </div>
+    <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+      <p class="text-xs text-white/60">Buts marqués</p>
+      <p class="text-2xl font-black mt-1">${teamInfo.goals}</p>
+    </div>
+    <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+      <p class="text-xs text-white/60">Buts encaissés</p>
+      <p class="text-2xl font-black mt-1">${teamInfo.conceded}</p>
+    </div>
+    <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+      <p class="text-xs text-white/60">Bilan</p>
+      <p class="text-2xl font-black mt-1">${teamInfo.record}</p>
+    </div>
+  `;
 
-    const tg = document.getElementById("teamGoals");
-    const tc = document.getElementById("teamConceded");
-    const tp = document.getElementById("teamPlayed");
-    const tr = document.getElementById("teamRecord");
+  const tg = document.getElementById("teamGoals");
+  const tc = document.getElementById("teamConceded");
+  const tp = document.getElementById("teamPlayed");
+  const tr = document.getElementById("teamRecord");
 
-    if(tg) tg.textContent = teamInfo.goals;
-    if(tc) tc.textContent = teamInfo.conceded;
-    if(tp) tp.textContent = teamInfo.played;
-    if(tr) tr.textContent = teamInfo.record;
-  }
+  if(tg) tg.textContent = teamInfo.goals;
+  if(tc) tc.textContent = teamInfo.conceded;
+  if(tp) tp.textContent = teamInfo.played;
+  if(tr) tr.textContent = teamInfo.record;
+ } 
+
 
   function renderRanking(){
     const body = document.getElementById("rankingBody");
@@ -599,82 +601,106 @@
 
     rankingData.forEach(row => {
       const isUs = row.team.toUpperCase() === TEAM_NAME.toUpperCase();
-
+    
+      
       const tr = document.createElement("tr");
       tr.className = "border-b border-white/10 " + (isUs ? "bg-red-500/15" : "bg-transparent");
 
       tr.innerHTML = `
-        <td class="px-4 py-3 ${isUs ? "font-black text-red-300" : "text-white/70"}">${row.rank}</td>
-        <td class="px-4 py-3 ${isUs ? "font-black text-red-200" : "font-semibold"}">${row.team}</td>
-        <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.J}</td>
-        <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.G}</td>
-        <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.P}</td>
-        <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.N}</td>
-        <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BP}</td>
-        <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BC}</td>
-        <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.PTS}</td>
-      `;
+  <td class="px-4 py-3 ${isUs ? "font-black text-red-300" : "text-white/70"}">${row.rank}</td>
+
+  <td class="px-4 py-3 ${isUs ? "font-black text-red-200" : "font-semibold"}">
+    ${row.team}
+    ${row.team === "ASTURIAS SPORTING" ? `<span class="ml-2 text-[10px] px-2 py-1 rounded-full bg-white/10 border border-white/10 text-white/60">EXCLUE</span>` : ``}
+  </td>
+
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.J}</td>
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.G}</td>
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.P}</td>
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.N}</td>
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BP}</td>
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BC}</td>
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.PTS}</td>
+`;
+
 
       body.appendChild(tr);
     });
   }
 
   function renderMatches(){
-    const container = document.getElementById("matchesList");
-    if(!container) return;
+  const container = document.getElementById("matchesList");
+  const select = document.getElementById("daySelect");
+  if(!container || !select) return;
+
+  const days = [...new Set(matches.map(m => m.day))].sort((a,b)=>a-b);
+
+  select.innerHTML = days.map(d => `<option value="${d}">Journée ${String(d).padStart(2,"0")}</option>`).join("");
+
+  function renderDay(dayNumber){
     container.innerHTML = "";
 
-    const validMatches = matches.filter(m => !isExcludedMatch(m));
+    const dayMatches = matches
+      .filter(m => m.day === dayNumber)
+      .sort((a,b) => (a.home || "").localeCompare(b.home || ""));
 
-    const grouped = new Map();
-    for(const m of validMatches){
-      if(!grouped.has(m.day)) grouped.set(m.day, []);
-      grouped.get(m.day).push(m);
-    }
+    const dateLabel = dayMatches[0]?.date ? formatDateFR(dayMatches[0].date) : "";
 
-    const days = Array.from(grouped.keys()).sort((a,b)=>a-b);
+    const header = document.createElement("div");
+    header.className = "rounded-3xl border border-white/10 bg-white/5 p-5";
+    header.innerHTML = `
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="font-black text-lg">Journée ${String(dayNumber).padStart(2,"0")}</p>
+          <p class="text-white/60 text-sm">DIV 3A</p>
+        </div>
+        <span class="text-xs text-white/50">${dateLabel}</span>
+      </div>
+    `;
+    container.appendChild(header);
 
-    for(const day of days){
-      const header = document.createElement("div");
-      header.className = "rounded-3xl border border-white/10 bg-white/5 p-5";
-      header.innerHTML = `
-        <div class="flex items-center justify-between gap-4">
+    dayMatches.forEach(m => {
+      const card = document.createElement("div");
+      card.className = "rounded-3xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition";
+
+      const involvesAsturias = (m.home === EXCLUDED_TEAM || m.away === EXCLUDED_TEAM);
+
+      let rightText = "";
+      if(involvesAsturias){
+        rightText = `<span class="text-white/40 text-sm">—</span>`;
+      } else if(m.homeScore !== undefined && m.awayScore !== undefined){
+        rightText = `<span class="rounded-2xl border border-white/10 bg-zinc-950/50 px-4 py-2 font-black">${m.homeScore} - ${m.awayScore}</span>`;
+      } else if(m.note){
+        rightText = `<span class="rounded-2xl border border-white/10 bg-zinc-950/50 px-4 py-2 font-black">${m.note}</span>`;
+      } else {
+        rightText = `<span class="text-white/50 text-sm">${m.time ? m.time : "À venir"}</span>`;
+      }
+
+      card.innerHTML = `
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <p class="font-black text-lg">Journée ${String(day).padStart(2,"0")}</p>
-            <p class="text-white/60 text-sm">DIV 3A</p>
+            <p class="font-black text-base">
+              ${highlightTeamName(m.home)} <span class="text-white/40">vs</span> ${highlightTeamName(m.away)}
+            </p>
+            <p class="text-sm text-white/60">${m.date ? formatDateFR(m.date) : ""}</p>
           </div>
-          <span class="text-xs text-white/50">${grouped.get(day)[0].date ? formatDateFR(grouped.get(day)[0].date) : ""}</span>
+          <div class="flex items-center gap-3">
+            ${rightText}
+          </div>
         </div>
       `;
 
-      container.appendChild(header);
-
-      grouped.get(day).forEach(m => {
-        const card = document.createElement("div");
-        card.className = "rounded-3xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition";
-
-        const scoreText = (m.homeScore !== undefined && m.awayScore !== undefined)
-          ? `<span class="rounded-2xl border border-white/10 bg-zinc-950/50 px-4 py-2 font-black">${m.homeScore} - ${m.awayScore}</span>`
-          : (m.note ? `<span class="rounded-2xl border border-white/10 bg-zinc-950/50 px-4 py-2 font-black">${m.note}</span>` : `<span class="text-white/50 text-sm">${m.time ? m.time : "À venir"}</span>`);
-
-        card.innerHTML = `
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div>
-              <p class="font-black text-base">
-                ${highlightTeamName(m.home)} <span class="text-white/40">vs</span> ${highlightTeamName(m.away)}
-              </p>
-              <p class="text-sm text-white/60">${m.date ? formatDateFR(m.date) : ""}</p>
-            </div>
-            <div class="flex items-center gap-3">
-              ${scoreText}
-            </div>
-          </div>
-        `;
-
-        container.appendChild(card);
-      });
-    }
+      container.appendChild(card);
+    });
   }
+
+  renderDay(days[0]);
+
+  select.addEventListener("change", () => {
+    renderDay(Number(select.value));
+  });
+}
+
 
   renderPlayers();
   renderStats();
