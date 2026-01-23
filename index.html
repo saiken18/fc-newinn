@@ -77,8 +77,18 @@
   }
 }
 @media (max-width: 420px){
-  .pitch .h-10.w-10{ width: 36px !important; height: 36px !important; }
+  /* bulles + noms sur mobile */
+  .pitch .lineup-bubble{
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 13px !important;
+  }
+  .pitch .lineup-name{
+    max-width: 70px !important;
+    font-size: 10px !important;
+  }
 }
+
 
 
 
@@ -1356,11 +1366,13 @@ function makePlayerBubble(name){
   const el = document.createElement("div");
   el.className = "flex flex-col items-center gap-1";
   el.innerHTML = `
-    <div class="h-10 w-10 rounded-full border border-white/20 bg-zinc-950/50 backdrop-blur
-                flex items-center justify-center text-sm font-black">
-      ${initials || "—"}
-    </div>
-    <div class="text-[11px] text-white/90 font-semibold max-w-[90px] truncate">${name || "—"}</div>
+  <div class="lineup-bubble h-10 w-10 rounded-full border border-white/20 bg-zinc-950/50 backdrop-blur
+              flex items-center justify-center text-sm font-black">
+    ${initials || "—"}
+  </div>
+  <div class="lineup-name text-[11px] text-white/90 font-semibold max-w-[90px] truncate">
+    ${name || "—"}
+  </div>
   `;
   return el;
 }
@@ -1385,10 +1397,15 @@ function renderPitch(){
 
     const rowWrap = document.createElement("div");
 rowWrap.className = "flex items-center justify-between w-full";
-rowWrap.style.maxWidth = "92%";      // empêche de coller aux bords
-rowWrap.style.margin = "0 auto";     // centre la ligne
-rowWrap.style.padding = "0 12px";    // marge interne gauche/droite
-rowWrap.style.gap = "10px";          // un peu moins d’espace
+rowWrap.style.margin = "0 auto";
+
+// ✅ on adapte selon le nombre de joueurs sur la ligne
+// (4 défenseurs = ligne la plus “large” sur mobile)
+const isWideLine = count >= 4;
+
+rowWrap.style.maxWidth = isWideLine ? "84%" : "92%"; // <-- clé
+rowWrap.style.padding = isWideLine ? "0 6px" : "0 12px";
+rowWrap.style.gap = isWideLine ? "6px" : "10px";
 
     for(let i=0; i<count; i++){
       const name = starters[idx] ?? "—";
