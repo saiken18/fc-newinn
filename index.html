@@ -30,12 +30,13 @@
 /* HERO mobile : image répétée verticalement (sans trou) */
 @media (max-width: 768px){
   .hero-bg{
-    background-size: 100% auto;   /* l’image rentre en largeur */
-    background-repeat: repeat-y;  /* répète vers le bas */
+    background-size: 100% auto;   /* image plus grande → répète moins */
+    background-repeat: repeat-y;  /* répète verticalement */
     background-position: center top;
-    min-height: 130vh;            /* pour voir la répétition (tu peux mettre 100vh si tu veux) */
+    min-height: 105vh;             /* 👈 clé du problème */
   }
 }
+
 
 
 
