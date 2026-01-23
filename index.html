@@ -21,16 +21,18 @@
   /* Fix image HERO sur mobile */
  @media (max-width: 768px){
   .hero-bg{
-    background-position: center 15% !important;
-    background-size: 115% !important;
-    min-height: 100svh !important;
-    outline: 4px solid red !important
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    background-position: center 25% !important;
+    background-attachment: scroll !important;
+    min-height: 100vh !important;
   }
 }
 
 
-
-
+.hero-bg{
+  background-repeat: no-repeat;
+}
 
   </style>
 </head>
@@ -76,7 +78,7 @@
   <!-- HERO -->
   <section
   id="home"
-   class="hero-bg relative overflow-hidden bg-cover bg-center"
+   class="hero-bg relative overflow-hidden bg-cover bg-center bg-no-repeat"
   style="background-image: url('hero.jpg');"
 >
 <div class="absolute inset-0 bg-black/60"></div>
@@ -170,7 +172,7 @@
         </div>
 
         <!-- Bloc "match / stats rapides" -->
-        <div class="rounded-3xl border border-white/10 bg-white/5 p-6 redGlow">
+        <div class="hidden md:block rounded-3xl border border-white/10 bg-white/5 p-6 redGlow">
           <div class="flex items-center justify-between">
             <p class="font-black text-lg">Infos équipe</p>
             <span class="text-xs text-white/60"></span>
@@ -221,6 +223,56 @@
       </div>
     </div>
   </section>
+  <section class="mx-auto max-w-6xl px-4 py-8 md:hidden">
+  <div class="rounded-3xl border border-white/10 bg-white/5 p-6 redGlow">
+
+    <div class="flex items-center justify-between">
+      <p class="font-black text-lg">Infos équipe</p>
+      <span class="text-xs text-white/60"></span>
+    </div>
+
+    <div class="mt-5 rounded-3xl bg-zinc-950/60 border border-white/10 p-5">
+      <div class="flex items-center gap-4">
+        <div class="h-14 w-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+          <img src="newinn_logo.png" alt="Logo FC Newinn" class="h-12 w-12 object-contain" />
+        </div>
+        <div>
+          <p class="text-white/60 text-sm">Équipe</p>
+          <p class="text-2xl font-black">NEW INN FC 1</p>
+        </div>
+      </div>
+
+      <div class="mt-4 text-white/70 text-sm"></div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-2 gap-3">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <p class="text-xs text-white/60">Buts</p>
+        <p class="text-xl font-black" id="teamGoalsMobile">18</p>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <p class="text-xs text-white/60">Buts encaissés</p>
+        <p class="text-xl font-black" id="teamConcededMobile">44</p>
+      </div>
+    </div>
+
+    <div class="mt-3 grid grid-cols-2 gap-3">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <p class="text-xs text-white/60">Matchs joués</p>
+        <p class="text-xl font-black" id="teamPlayedMobile">14</p>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <p class="text-xs text-white/60">Bilan</p>
+        <p class="text-xl font-black" id="teamRecordMobile">2V-3N-9D</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+  
 
   <!-- PLAYERS -->
   <section id="players" class="mx-auto max-w-6xl px-4 py-12">
@@ -672,6 +724,16 @@ function setNextMatchBadge(){
   if(tc) tc.textContent = teamInfo.conceded;
   if(tp) tp.textContent = teamInfo.played;
   if(tr) tr.textContent = teamInfo.record;
+  const tgm = document.getElementById("teamGoalsMobile");
+const tcm = document.getElementById("teamConcededMobile");
+const tpm = document.getElementById("teamPlayedMobile");
+const trm = document.getElementById("teamRecordMobile");
+
+if(tgm) tgm.textContent = teamInfo.goals;
+if(tcm) tcm.textContent = teamInfo.conceded;
+if(tpm) tpm.textContent = teamInfo.played;
+if(trm) trm.textContent = teamInfo.record;
+
  } 
 
 
