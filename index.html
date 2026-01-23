@@ -18,22 +18,28 @@
     background: #0a0a0a; /* fond sombre */
     color: white;        /* texte blanc */
   }
-  /* Fix image HERO sur mobile */
- @media (max-width: 768px){
+ /* HERO par défaut (PC + mobile) */
+.hero-bg{
+  background-image: url('hero.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat;
+  min-height: 100vh;
+}
+
+/* Mobile : image répétée proprement */
+@media (max-width: 768px){
   .hero-bg{
-    min-height: 72vh !important;         /* au lieu de 100vh */
-    background-size: contain !important;
-    background-color: #0a0a0a !important;
-    background-position: center 35% !important; /* on montre + le haut */
-    background-repeat: no-repeat !important;
+    min-height: auto;
+    padding-bottom: 4rem;
+    background-size: cover;
+    background-repeat: repeat;
+    background-position: center 20%;
+    background-attachment: scroll;
   }
 }
 
 
-
-.hero-bg{
-  background-repeat: no-repeat;
-}
 
   </style>
 </head>
@@ -80,7 +86,6 @@
   <section
   id="home"
    class="hero-bg relative overflow-hidden bg-cover bg-center bg-no-repeat"
-  style="background-image: url('hero.jpg');"
 >
 <div class="absolute inset-0 bg-black/60"></div>
 
