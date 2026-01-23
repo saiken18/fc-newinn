@@ -9,10 +9,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    /* petit glow rouge discret */
-    .redGlow{
-      box-shadow: 0 0 0 1px rgba(239,68,68,.25), 0 0 40px rgba(239,68,68,.12);
-    }
+
+    
      /* FIX dropdown select (options) */
   select option{
     background: #0a0a0a; /* fond sombre */
@@ -33,7 +31,7 @@
     background-size: 100% auto;   /* image plus grande → répète moins */
     background-repeat: repeat-y;  /* répète verticalement */
     background-position: center top;
-    min-height: 100vh;             /* 👈 clé du problème */
+    min-height: 80vh;             /* 👈 clé du problème */
   }
 }
 
@@ -100,8 +98,7 @@
 
         <div>
           <p class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/70">
-            🏟️ Club de <span class="whitespace-nowrap">Kraainem</span> • Matchs à domicile : Rue au Bois 81, 1950 <span class="whitespace-nowrap">Kraainem</span>
-
+            🏟️ Club de Kraainem • Matchs à domicile : Rue au Bois 81, 1950 Kraainem
           </p>
 
           <h1 class="mt-4 text-4xl md:text-5xl font-black leading-tight">
@@ -178,7 +175,7 @@
         </div>
 
         <!-- Bloc "match / stats rapides" -->
-        <div class="hidden md:block rounded-3xl border border-white/10 bg-white/5 p-6 redGlow">
+        <div class="hidden md:block rounded-3xl border border-white/10 bg-white/5 p-6">
           <div class="flex items-center justify-between">
             <p class="font-black text-lg">Infos équipe</p>
             <span class="text-xs text-white/60"></span>
