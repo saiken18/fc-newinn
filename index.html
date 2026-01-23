@@ -76,6 +76,10 @@
     max-height: 520px;
   }
 }
+@media (max-width: 420px){
+  .pitch .h-10.w-10{ width: 36px !important; height: 36px !important; }
+}
+
 
 
 
@@ -1380,8 +1384,11 @@ function renderPitch(){
     row.style.transform = "translateY(-50%)";
 
     const rowWrap = document.createElement("div");
-    rowWrap.className = "flex justify-center w-full px-3";
-    rowWrap.style.gap = "16px";
+rowWrap.className = "flex items-center justify-between w-full";
+rowWrap.style.maxWidth = "92%";      // empêche de coller aux bords
+rowWrap.style.margin = "0 auto";     // centre la ligne
+rowWrap.style.padding = "0 12px";    // marge interne gauche/droite
+rowWrap.style.gap = "10px";          // un peu moins d’espace
 
     for(let i=0; i<count; i++){
       const name = starters[idx] ?? "—";
