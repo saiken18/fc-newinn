@@ -60,7 +60,14 @@
   </header>
 
   <!-- HERO -->
-  <section id="home" class="relative overflow-hidden">
+  <section
+  id="home"
+  class="relative overflow-hidden bg-cover bg-center"
+  style="background-image: url('hero.jpg');"
+>
+<div class="absolute inset-0 bg-black/60"></div>
+
+
 
     <div class="absolute inset-0 opacity-45">
       <div class="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-red-600 blur-[120px]"></div>
@@ -152,7 +159,7 @@
         <div class="rounded-3xl border border-white/10 bg-white/5 p-6 redGlow">
           <div class="flex items-center justify-between">
             <p class="font-black text-lg">Infos équipe</p>
-            <span class="text-xs text-white/60">Stats (à 0 pour l’instant)</span>
+            <span class="text-xs text-white/60"></span>
           </div>
 
           <div class="mt-5 rounded-3xl bg-zinc-950/60 border border-white/10 p-5">
@@ -167,7 +174,7 @@
             </div>
 
             <div class="mt-4 text-white/70 text-sm">
-              Calendrier & scores à venir (dès que tu m’envoies les matchs ✅)
+          
             </div>
           </div>
 
@@ -208,14 +215,14 @@
         <h2 class="text-2xl font-black">👥 Joueurs</h2>
         <p class="text-white/60 mt-1">Effectif officiel du <span class="text-red-400 font-semibold">FC Newinn</span>.</p>
       </div>
-      <div class="hidden md:block text-white/60 text-sm">Pas de numéros fixes ✅</div>
+      <div class="hidden md:block text-white/60 text-sm"></div>
     </div>
 
     <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="playersGrid"></div>
 
     <div class="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
       <p class="font-black text-lg" id="playerName">Clique sur un joueur</p>
-      <p class="text-white/60 mt-2" id="playerInfo">Position + stats (actuellement à zéro).</p>
+      <p class="text-white/60 mt-2" id="playerInfo"></p>
     </div>
   </section>
 
@@ -223,8 +230,8 @@
   <section id="stats" class="mx-auto max-w-6xl px-4 py-12">
     <h2 class="text-2xl font-black">📊 Statistiques</h2>
     <p class="text-white/60 mt-1">
-      Pour l’instant je mets <span class="font-semibold text-white">tout à 0</span>.
-      Quand tu me donnes tes matchs + buteurs/passeurs, je te fais un truc propre 🔥
+      <span class="font-semibold text-white"></span>.
+     
     </p>
 
     <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4" id="statsBoxes"></div>
@@ -236,7 +243,7 @@
       <div>
         <h2 class="text-2xl font-black">🏆 Classement — ABBSA Division 3</h2>
         <p class="text-white/60 mt-1">
-          <span class="text-red-400 font-semibold">NEW INN FC 1</span> est mis en évidence.
+          <span class="text-red-400 font-semibold">NEW INN FC 1</span>
         </p>
       </div>
       <button class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 transition border border-white/10 text-sm"
@@ -267,8 +274,8 @@
     </div>
 
     <p class="text-white/50 text-xs mt-3">
-      📝 Astuce : pour mettre à jour le classement, il suffit de modifier le tableau <span class="text-white/70 font-semibold">rankingData</span> dans le code.
-      Je t’explique juste après 😉
+      <span class="text-white/70 font-semibold">rankingData</span> 
+     
     </p>
   </section>
 
