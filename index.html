@@ -21,13 +21,13 @@
   /* Fix image HERO sur mobile */
  @media (max-width: 768px){
   .hero-bg{
-    background-repeat: no-repeat !important;
+    min-height: 72vh !important;         /* au lieu de 100vh */
     background-size: cover !important;
-    background-position: center 25% !important;
-    background-attachment: scroll !important;
-    min-height: 100vh !important;
+    background-position: center 35% !important; /* on montre + le haut */
+    background-repeat: no-repeat !important;
   }
 }
+
 
 
 .hero-bg{
