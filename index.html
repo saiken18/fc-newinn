@@ -1396,7 +1396,8 @@ function renderPitch(){
     row.style.transform = "translateY(-50%)";
 
     const rowWrap = document.createElement("div");
-rowWrap.className = "flex items-center justify-between w-full";
+rowWrap.className = "flex items-center w-full";
+rowWrap.style.justifyContent = (count === 1) ? "center" : "space-between";
 rowWrap.style.margin = "0 auto";
 
 // ✅ on adapte selon le nombre de joueurs sur la ligne
