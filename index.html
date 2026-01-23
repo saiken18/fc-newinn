@@ -37,6 +37,47 @@
     min-height: 70vh;
   }
 }
+/* Terrain style (OneFootball vibe) */
+.pitch{
+  aspect-ratio: 3 / 4;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.10), transparent 45%),
+    linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.05) 0px,
+      rgba(255,255,255,.05) 2px,
+      transparent 2px,
+      transparent 34px
+    ),
+    linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,.35));
+}
+
+.pitch::before{
+  content:"";
+  position:absolute; inset:14px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:16px;
+  pointer-events:none;
+}
+.pitch::after{
+  content:"";
+  position:absolute;
+  left:50%; top:50%;
+  width:120px; height:120px;
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  pointer-events:none;
+}
+/* Sur desktop : on réduit un peu la hauteur du terrain */
+@media (min-width: 900px){
+  .pitch{
+    max-height: 520px;
+  }
+}
+
+
 
   </style>
 </head>
@@ -151,21 +192,29 @@
     ✈️ Extérieur — Avenue Jean-François De Becker 60, 1200 Woluwé-Saint-Lambert (Terrain 3A)
   </p>
 
-  <div class="mt-4 flex items-center gap-3">
-    <span
-      id="nmBadge"
-      class="inline-flex items-center rounded-full border border-white/10 bg-zinc-950/40 px-3 py-1 text-xs text-white/70"
-    >
-      J-?
-    </span>
+  <div class="mt-4 flex flex-wrap items-center gap-3">
+  <span
+    id="nmBadge"
+    class="inline-flex items-center rounded-full border border-white/10 bg-zinc-950/40 px-3 py-1 text-xs text-white/70"
+  >
+    J-?
+  </span>
 
-    <button
-      onclick="goTo('calendar')"
-      class="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-zinc-950 hover:brightness-110 transition"
-    >
-      Voir le calendrier
-    </button>
-  </div>
+  <button
+    onclick="goTo('calendar')"
+    class="rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-zinc-950 hover:brightness-110 transition"
+  >
+    Voir le calendrier
+  </button>
+
+  <button
+    onclick="openLineup()"
+    class="rounded-xl bg-white/10 hover:bg-white/15 transition border border-white/10 px-4 py-2 text-sm font-bold"
+  >
+    Voir la composition
+  </button>
+</div>
+
 </div>
 
 
@@ -429,37 +478,42 @@
     assists: 0
   };
 
-  const players = [
-    { name: "Loic Vanderlinden", position: "Gardien", goals: 0, assists: 0 },
-    { name: "Baptiste Doupagne", position: "Gardien", goals: 0, assists: 0 },
+ const players = [
+  // GARDIENS (avec stats gardien en +)
+  { name: "Loic Vanderlinden", position: "Gardien", goals: 0, assists: 0, played: 0, yellow: 0, red: 0, conceded: 0, cleanSheets: 0 },
+  { name: "Baptiste Doupagne", position: "Gardien", goals: 0, assists: 0, played: 0, yellow: 0, red: 0, conceded: 0, cleanSheets: 0 },
 
-    { name: "Maxime Vanderlinden", position: "Défenseur", goals: 0, assists: 0 },
-    { name: "Noah Ceuppers", position: "Milieu / Défenseur", goals: 0, assists: 0 },
-    { name: "Emmanuel", position: "Défenseur", goals: 0, assists: 0 },
-    { name: "Sami Ouartan", position: "Défenseur", goals: 0, assists: 0 },
-    { name: "Sami", position: "Défenseur", goals: 0, assists: 0 },
-    { name: "Rodolphe", position: "Défenseur", goals: 0, assists: 0 },
-    { name: "Matteo", position: "Défenseur", goals: 0, assists: 0 },
-    { name: "Polat", position: "Défenseur", goals: 0, assists: 0 },
-    { name: "Ariel", position: "Défenseur", goals: 0, assists: 0 },
-    { name: "Arthur Rollier", position: "Défenseur", goals: 0, assists: 0 },
+  // DEFENSEURS
+  { name: "Maxime Vanderlinden", position: "Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Noah Ceuppers", position: "Milieu / Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Emmanuel", position: "Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Sami Ouartan", position: "Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Sami", position: "Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Rodolphe", position: "Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Matteo", position: "Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Polat", position: "Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Ariel", position: "Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Arthur Rollier", position: "Défenseur", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
 
-    { name: "Thomas Mathieu (Capitaine)", position: "Défenseur / Milieu", goals: 0, assists: 0 },
+  { name: "Thomas Mathieu (Capitaine)", position: "Défenseur / Milieu", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
 
-    { name: "Adam", position: "Milieu", goals: 0, assists: 0 },
-    { name: "Théo Marchal", position: "Milieu", goals: 0, assists: 0 },
-    { name: "Julien Marchal", position: "Milieu", goals: 0, assists: 0 },
-    { name: "Audry Changoluiza", position: "Milieu", goals: 0, assists: 0 },
+  // MILIEUX
+  { name: "Adam", position: "Milieu", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Théo Marchal", position: "Milieu", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Julien Marchal", position: "Milieu", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Audry Changoluiza", position: "Milieu", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
 
-    { name: "Romain Marchal", position: "Attaquant", goals: 0, assists: 0 },
-    { name: "Ahmed Alouini", position: "Attaquant", goals: 0, assists: 0 },
-    { name: "Jodel Kaze Ntibarufata", position: "Attaquant", goals: 0, assists: 0 },
-    { name: "Nolan", position: "Milieu / Attaquant", goals: 0, assists: 0 },
-    { name: "Diego Gomez", position: "Attaquant", goals: 0, assists: 0 },
-    { name: "Nolan", position: "Attaquant", goals: 0, assists: 0 },
-    { name: "Kevin Corrales", position: "Attaquant", goals: 0, assists: 0 },
-    { name: "Mohammed Amine Amara", position: "Attaquant", goals: 0, assists: 0 }
-  ];
+  // ATTAQUANTS
+  { name: "Romain Marchal", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Ahmed Alouini", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Jodel Kaze Ntibarufata", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Nolan", position: "Milieu / Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Diego Gomez", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Nolan", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Kevin Corrales", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Mohammed Amine Amara", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 }
+];
+
 
   const rankingData = [
     { rank: 1, team: "MACCABI BXL", J: 15, G: 10, P: 4, N: 1, BP: 48, BC: 22, PTS: 31 },
@@ -729,10 +783,27 @@ function setNextMatchBadge(){
     card.addEventListener("click", () => {
       document.getElementById("playerName").textContent = p.name || "";
 
+const isGoalkeeper = (p.position || "").toLowerCase().includes("gardien");
+
 document.getElementById("playerInfo").innerHTML = `
   <div class="mt-2 text-white/70">${p.position || ""}</div>
 
   <div class="mt-4 flex flex-wrap gap-2">
+    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+      🕒 <span class="font-black text-white">${p.played ?? 0}</span>
+      <span class="text-white/60">Matchs</span>
+    </span>
+
+    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+      🟨 <span class="font-black text-white">${p.yellow ?? 0}</span>
+      <span class="text-white/60">Jaunes</span>
+    </span>
+
+    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+      🟥 <span class="font-black text-white">${p.red ?? 0}</span>
+      <span class="text-white/60">Rouges</span>
+    </span>
+
     <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
       ⚽ <span class="font-black text-white">${p.goals ?? 0}</span>
       <span class="text-white/60">Buts</span>
@@ -742,12 +813,25 @@ document.getElementById("playerInfo").innerHTML = `
       🎯 <span class="font-black text-white">${p.assists ?? 0}</span>
       <span class="text-white/60">Passes</span>
     </span>
+
+    ${isGoalkeeper ? `
+      <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+        🧤 <span class="font-black text-white">${p.cleanSheets ?? 0}</span>
+        <span class="text-white/60">Clean sheets</span>
+      </span>
+
+      <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+        🥅 <span class="font-black text-white">${p.conceded ?? 0}</span>
+        <span class="text-white/60">Buts encaissés</span>
+      </span>
+    ` : ``}
   </div>
 
   <div class="mt-4 text-xs text-white/50">
-    (Plus tard : photo, bio, notes match, etc.)
+    (Bientôt : photo, bio, notes match, etc.)
   </div>
 `;
+
 
     });
 
@@ -1006,6 +1090,79 @@ if(trm) trm.textContent = teamInfo.record;
 
   </div>
 </footer>
+<!-- ✅ MODAL COMPOSITION -->
+<div id="lineupModal" class="hidden fixed inset-0 z-50">
+  <div class="absolute inset-0 bg-black/70" onclick="closeLineup()"></div>
+
+  <div class="relative mx-auto mt-10 w-[92%] max-w-3xl rounded-3xl border border-white/10 bg-zinc-950/70 backdrop-blur-xl p-5
+            max-h-[90vh] overflow-y-auto">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="text-white/60 text-xs">Composition — prochain match</p>
+        <p class="mt-1 text-xl font-black">
+          <span id="lineupTitle">NEW INN FC 1 vs CHIEFS WSL 2</span>
+        </p>
+        <p class="text-white/70 text-sm mt-1">
+          <span id="lineupMeta">Samedi 24 janvier 2026 — 15:30</span>
+          <span class="text-white/40"> • </span>
+          <span id="lineupFormation" class="text-white/60">4-3-3</span>
+        </p>
+      </div>
+
+      <button onclick="closeLineup()"
+        class="rounded-xl bg-white/10 hover:bg-white/15 transition border border-white/10 px-3 py-2 text-sm font-bold">
+        ✕
+      </button>
+    </div>
+
+    <!-- Terrain (OneFootball style) -->
+<div class="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
+  <div class="flex items-center justify-between gap-3">
+    <p class="font-black">Composition</p>
+    <span class="text-xs text-white/60">Formation : <span id="lineupFormation">4-3-3</span></span>
+  </div>
+
+  <div id="lineupPitch"
+       class="mt-4 pitch relative w-full overflow-hidden rounded-2xl border border-white/10">
+  </div>
+</div>
+
+<!-- Listes (en dessous) -->
+<div class="mt-4 grid md:grid-cols-2 gap-4">
+  <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+    <p class="font-black">Titulaires</p>
+    <div id="lineupStarters" class="mt-3 flex flex-col gap-2"></div>
+  </div>
+
+  <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+    <p class="font-black">Remplaçants</p>
+    <div id="lineupSubs" class="mt-3 flex flex-col gap-2"></div>
+  </div>
+</div>
+
+<!-- Staff -->
+<div class="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+  <p class="font-black">Staff</p>
+  <div class="mt-3 flex flex-wrap gap-2">
+    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+      🧑‍⚖️ <span class="font-black text-white" id="lineupDelegate">—</span>
+      <span class="text-white/60">Délégué</span>
+    </span>
+    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+      🧠 <span class="font-black text-white" id="lineupCoach">—</span>
+      <span class="text-white/60">Coach</span>
+    </span>
+  </div>
+</div>
+
+  </div>
+</div>
+
+<!-- ✅ TOAST MESSAGE (petit message en bas) -->
+<div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50
+  rounded-full border border-white/10 bg-zinc-950/70 backdrop-blur px-4 py-2 text-sm text-white/80">
+  —
+</div>
 
 <script>
   // année automatique
@@ -1081,8 +1238,166 @@ document.getElementById("nextDayBtn")?.addEventListener("click", () => {
   if (!daySelect) return;
   setDayByIndex(daySelect.selectedIndex + 1);
 });
+// ===== COMPOSITION PROCHAIN MATCH =====
+// 👉 Quand tu as la compo : passe available à true + remplis les listes
+const nextLineup = {
+  available: true, // ⛔️ mets true quand tu veux afficher la compo
+
+  title: "NEW INN FC 1 vs CHIEFS WSL 2",
+  meta: "Samedi 24 janvier 2026 — 15:30",
+  formation: "4-3-3",
+
+ starters: [
+  "Loic",                 // Gardien
+
+  "Rodolphe",             // Défenseur gauche
+  "Sami Ouartan",         // Défenseur central (gauche)
+  "Noah Ceuppers",        // Défenseur central (droit)
+  "Polat",                // Défenseur droit
+
+  "Audry Changoluiza",    // Milieu centre gauche
+  "Théo Marchal",         // Milieu centre
+  "Julien Marchal",       // Milieu centre droit
+
+  "Jodel Kaze Ntibarufata", // Attaquant gauche
+  "Romain Marchal",         // Buteur (pointe)
+  "Nolan"                   // Attaquant droit
+],
+
+  subs: [
+  "Diego Gomez",
+  "Kevin Corrales",
+  "Nolan",
+  "Sami"
+],
+
+
+  delegate: "PASCHOLD",
+  
+};
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.remove("hidden");
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => t.classList.add("hidden"), 2500);
+}
+
+function openLineup(){
+  if(!nextLineup.available){
+    showToast("La composition n’est pas encore disponible.");
+    return;
+  }
+
+  document.getElementById("lineupTitle").textContent = nextLineup.title || "";
+  document.getElementById("lineupMeta").textContent = nextLineup.meta || "";
+  document.getElementById("lineupFormation").textContent = nextLineup.formation || "";
+  document.getElementById("lineupDelegate").textContent = nextLineup.delegate || "—";
+  document.getElementById("lineupCoach").textContent = nextLineup.coach || "—";
+
+  const startersBox = document.getElementById("lineupStarters");
+  const subsBox = document.getElementById("lineupSubs");
+
+  startersBox.innerHTML = "";
+  subsBox.innerHTML = "";
+
+  (nextLineup.starters || []).forEach((name, i) => {
+    const row = document.createElement("div");
+    row.className = "flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2";
+    row.innerHTML = `
+      <span class="text-white/70 text-xs">#${i+1}</span>
+      <span class="font-bold">${name}</span>
+      <span class="text-white/40 text-xs">T</span>
+    `;
+    startersBox.appendChild(row);
+  });
+
+  (nextLineup.subs || []).forEach((name, i) => {
+    const row = document.createElement("div");
+    row.className = "flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2";
+    row.innerHTML = `
+      <span class="text-white/70 text-xs">#${i+1}</span>
+      <span class="font-bold">${name}</span>
+      <span class="text-white/40 text-xs">R</span>
+    `;
+    subsBox.appendChild(row);
+  });
+
+  renderPitch();
+  document.body.style.overflow = "hidden";
+  document.getElementById("lineupModal").classList.remove("hidden");
+}
+
+function closeLineup(){
+  document.getElementById("lineupModal")?.classList.add("hidden");
+  document.body.style.overflow = "";
+}
+function parseFormation(str){
+  return (str || "")
+    .split("-")
+    .map(x => parseInt(x.trim(), 10))
+    .filter(n => Number.isFinite(n) && n > 0);
+}
+
+function makePlayerBubble(name){
+  const initials = (name || "—")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0,2)
+    .map(s => s[0].toUpperCase())
+    .join("");
+
+  const el = document.createElement("div");
+  el.className = "flex flex-col items-center gap-1";
+  el.innerHTML = `
+    <div class="h-10 w-10 rounded-full border border-white/20 bg-zinc-950/50 backdrop-blur
+                flex items-center justify-center text-sm font-black">
+      ${initials || "—"}
+    </div>
+    <div class="text-[11px] text-white/90 font-semibold max-w-[90px] truncate">${name || "—"}</div>
+  `;
+  return el;
+}
+
+function renderPitch(){
+  const pitch = document.getElementById("lineupPitch");
+  if(!pitch) return;
+
+  pitch.innerHTML = "";
+
+  const lines = parseFormation(nextLineup.formation);
+  const allLines = [1, ...lines]; // GK + lignes formation
+  const starters = (nextLineup.starters || []).slice(0, 11);
+
+  let idx = 0;
+  allLines.forEach((count, lineIndex) => {
+    const row = document.createElement("div");
+    row.className = "absolute left-0 right-0 flex justify-center";
+    const y = 88 - (lineIndex * (70 / Math.max(1, allLines.length - 1)));
+    row.style.top = `${y}%`;
+    row.style.transform = "translateY(-50%)";
+
+    const rowWrap = document.createElement("div");
+    rowWrap.className = "flex justify-center w-full px-3";
+    rowWrap.style.gap = "16px";
+
+    for(let i=0; i<count; i++){
+      const name = starters[idx] ?? "—";
+      idx++;
+      rowWrap.appendChild(makePlayerBubble(name));
+    }
+
+    row.appendChild(rowWrap);
+    pitch.appendChild(row);
+  });
+}
+
+
 
 </script>
+
 
 
 </body>
