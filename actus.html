@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FC Newinn — Actus</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:#0b0b0d;
+      color:#fff;
+    }
+
+    .page{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    a{ color:#fff; text-decoration:none; }
+
+    h1{ margin:0 0 8px; font-size:32px; }
+    .sub{ opacity:.75; margin-bottom:20px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+
+    .card{
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .thumb{
+      height:160px;
+      background-size:cover;
+      background-position:center;
+    }
+
+    .content{
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .badge{
+      font-size:12px;
+      opacity:.7;
+    }
+
+    .title{
+      font-size:18px;
+      margin:0;
+    }
+
+    .excerpt{
+      font-size:14px;
+      opacity:.85;
+    }
+
+    .btn{
+      margin-top:auto;
+      background:#ff3c3c;
+      color:#000;
+      padding:10px;
+      border-radius:12px;
+      text-align:center;
+      font-weight:700;
+    }
+
+    @media (max-width: 700px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <a href="index.html">← Retour au site</a>
+
+    <h1>Actus</h1>
+    <p class="sub">Toute l’actualité du FC Newinn</p>
+
+    <div class="grid">
+
+      <!-- ACTU 1 -->
+      <div class="card">
+        <div class="thumb" style="background-image:url('hero.jpg')"></div>
+        <div class="content">
+          <div class="badge">🗓 23 janvier 2026 · Match</div>
+          <h3 class="title">Victoire à l’extérieur 2–1 🔥</h3>
+          <p class="excerpt">Un match solide et une grosse mentalité d’équipe.</p>
+          <a class="btn" href="#">Lire</a>
+        </div>
+      </div>
+
+      <!-- ACTU 2 -->
+      <div class="card">
+        <div class="thumb" style="background-image:url('hero.mobile.jpg')"></div>
+        <div class="content">
+          <div class="badge">🗓 22 janvier 2026 · Entraînement</div>
+          <h3 class="title">Séance intense avant le match 💪</h3>
+          <p class="excerpt">Gros rythme, intensité et concentration.</p>
+          <a class="btn" href="#">Lire</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
