@@ -143,7 +143,7 @@
   </p>
 
   <p class="text-white/60 text-sm">
-    🏠 Domicile — Rue au Bois 81, 1950 Kraainem
+    ✈️ Extérieur — Avenue Jean-François De Becker 60, 1200 Woluwé-Saint-Lambert (Terrain 3A)
   </p>
 
   <div class="mt-4 flex items-center gap-3">
@@ -721,7 +721,27 @@ function setNextMatchBadge(){
 
     card.addEventListener("click", () => {
       document.getElementById("playerName").textContent = p.name || "";
-      document.getElementById("playerInfo").textContent = p.position || "";
+
+document.getElementById("playerInfo").innerHTML = `
+  <div class="mt-2 text-white/70">${p.position || ""}</div>
+
+  <div class="mt-4 flex flex-wrap gap-2">
+    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+      ⚽ <span class="font-black text-white">${p.goals ?? 0}</span>
+      <span class="text-white/60">Buts</span>
+    </span>
+
+    <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+      🎯 <span class="font-black text-white">${p.assists ?? 0}</span>
+      <span class="text-white/60">Passes</span>
+    </span>
+  </div>
+
+  <div class="mt-4 text-xs text-white/50">
+    (Plus tard : photo, bio, notes match, etc.)
+  </div>
+`;
+
     });
 
     grid.appendChild(card);
