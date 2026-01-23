@@ -72,9 +72,11 @@
   <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
           onclick="goTo('calendar')">Calendrier</button>
 
-  <!-- ✅ NOUVEAU -->
   <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
-          onclick="goTo('contact')">Contact</button>
+        onclick="goTo('contact')">Contacts</button>
+
+<button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+        onclick="window.location.href='actus.html'">Actus</button>
 </nav>
 
 </button>
@@ -661,22 +663,24 @@ function setNextMatchBadge(){
   const badge = document.getElementById("nmBadge");
   if(!badge) return;
 
-  // Prochain match que tu m'as donné : Journée 18, 24/01/2026 15:30
+  // Match : 24/01/2026 15:30
   const next = new Date("2026-01-24T15:30:00");
-
   const now = new Date();
-  const diffMs = next.getTime() - now.getTime();
 
-  // en jours (arrondi vers le bas)
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const dayMs = 1000 * 60 * 60 * 24;
 
-  if(diffMs > 0){
-    badge.textContent = `J-${diffDays}`;
+  // On compare uniquement les dates (à minuit), pas les heures
+  const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const matchMid = new Date(next.getFullYear(), next.getMonth(), next.getDate());
+
+  const diffDays = Math.round((matchMid - todayMid) / dayMs);
+
+  if (diffDays >= 0) {
+    badge.textContent = `J-${diffDays}`; // demain => J-1, aujourd'hui => J-0
   } else {
     badge.textContent = `J+${Math.abs(diffDays)}`;
   }
 }
-
 
   function goTo(id){
     document.getElementById(id).scrollIntoView({behavior:"smooth"});
