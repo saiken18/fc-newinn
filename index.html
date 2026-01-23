@@ -28,10 +28,11 @@
 /* HERO mobile : image répétée verticalement (sans trou) */
 @media (max-width: 768px){
   .hero-bg{
-    background-size: 100% auto;   /* image plus grande → répète moins */
-    background-repeat: repeat-y;  /* répète verticalement */
+  background-image: url('hero.mobile.jpg');
+    background-size: cover;
     background-position: center top;
-    min-height: 70vh;             /* 👈 clé du problème */
+    background-repeat: no-repeat;
+    min-height: 70vh;
   }
 }
 
