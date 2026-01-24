@@ -69,8 +69,14 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import {
-      getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  getAuth,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
     import {
       getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
@@ -89,6 +95,11 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    // Gestion du retour après redirection Google
+    getRedirectResult(auth).catch((error) => {
+     console.error("Erreur redirect Google:", error);
+    });
+
 
     const btnGoogle = document.getElementById("btnGoogle");
     const btnLogout = document.getElementById("btnLogout");
@@ -127,10 +138,10 @@
     }
 
     btnGoogle.addEventListener("click", async () => {
-      msg.textContent = "";
-      const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    });
+  const provider = new GoogleAuthProvider();
+  await signInWithRedirect(auth, provider);
+});
+
 
     btnLogout.addEventListener("click", async () => {
       await signOut(auth);
