@@ -68,18 +68,28 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import {
+
+import {
   getAuth,
   GoogleAuthProvider,
   signInWithRedirect,
   getRedirectResult,
   onAuthStateChanged,
-  signOut
+  signOut,
+  setPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-    import {
-      getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+
 
     // ✅ COLLE TON firebaseConfig ICI
      const firebaseConfig = {
@@ -93,12 +103,20 @@
   };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    // Gestion du retour après redirection Google
-    getRedirectResult(auth).catch((error) => {
-     console.error("Erreur redirect Google:", error);
-    });
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+setPersistence(auth, browserLocalPersistence)
+  .catch((e) => console.error("Persistence error", e));
+
+getRedirectResult(auth).catch((error) => {
+  console.error("Erreur redirect Google:", error);
+  const msgEl = document.getElementById("msg");
+  if (msgEl) msgEl.textContent = "❌ " + (error?.code || error?.message || "Erreur Google");
+});
+
+
+
 
 
     const btnGoogle = document.getElementById("btnGoogle");
@@ -117,30 +135,37 @@
       return snap.exists();
     }
 
-    async function consumeKeyAndRegister(uid, email, key){
-      const keyRef = doc(db, "invites", key);
-      const keySnap = await getDoc(keyRef);
+   async function consumeKeyAndRegister(uid, email, key){
+  const keyRef = doc(db, "invites", key);
+  const keySnap = await getDoc(keyRef);
 
-      if(!keySnap.exists()) throw new Error("Clé inconnue.");
-      const data = keySnap.data();
-      if(data.used === true) throw new Error("Clé déjà utilisée.");
+  if(!keySnap.exists()) throw new Error("Clé inconnue.");
+  const data = keySnap.data();
+  if(data.used === true) throw new Error("Clé déjà utilisée.");
+  if(!data.playerName) throw new Error("Clé sans nom (playerName manquant).");
 
-      await updateDoc(keyRef, {
-        used: true,
-        usedBy: uid,
-        usedAt: serverTimestamp()
-      });
+  // Marquer la clé comme utilisée (1 seule fois)
+  await updateDoc(keyRef, {
+    used: true,
+    usedBy: uid,
+    usedAt: serverTimestamp()
+  });
 
-      await setDoc(doc(db, "players", uid), {
-        email: email || "",
-        createdAt: serverTimestamp()
-      });
-    }
+  // Enregistrer le joueur (accès permanent)
+  await setDoc(doc(db, "players", uid), {
+    email: email || "",
+    name: data.playerName,   // ✅ nom venant de la clé
+    keyId: key,              // ✅ on garde la clé utilisée
+    createdAt: serverTimestamp()
+  });
+}
 
-    btnGoogle.addEventListener("click", async () => {
+
+   btnGoogle.addEventListener("click", async () => {
   const provider = new GoogleAuthProvider();
   await signInWithRedirect(auth, provider);
 });
+
 
 
     btnLogout.addEventListener("click", async () => {
@@ -183,13 +208,18 @@
 
       const ok = await isPlayer(user.uid);
       if(ok){
-        playerArea.style.display = "block";
-        keyBox.style.display = "none";
-      }else{
-        playerArea.style.display = "none";
-        keyBox.style.display = "block";
-        msg.textContent = "Première connexion : entre ta clé.";
-      }
+  const snap = await getDoc(doc(db, "players", user.uid));
+  const pdata = snap.data();
+  who.textContent = "Connecté : " + (pdata?.name ? (pdata.name + " — ") : "") + (user.email || "");
+  playerArea.style.display = "block";
+  keyBox.style.display = "none";
+}else{
+  who.textContent = "Connecté : " + (user.email || "");
+  playerArea.style.display = "none";
+  keyBox.style.display = "block";
+  msg.textContent = "Première connexion : entre ta clé.";
+}
+
     });
   </script>
 </body>
