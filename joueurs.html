@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FC Newinn — Espace joueurs</title>
+
+  <!-- Reprends tes styles si tu veux (sinon simple) -->
+  <style>
+    body{margin:0;font-family:system-ui;background:#0b1020;color:#fff}
+    .page{max-width:920px;margin:0 auto;padding:24px}
+    .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:18px;padding:16px;margin:14px 0}
+    .btn{cursor:pointer;border:0;border-radius:14px;padding:10px 14px;font-weight:600}
+    .btnPrimary{background:#fff;color:#111}
+    .btnGhost{background:rgba(255,255,255,.08);color:#fff}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .small{opacity:.85;font-size:14px}
+    input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;outline:none}
+    a{color:#fff}
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <a href="index.html">← Retour au site</a>
+
+    <h1>Espace joueurs</h1>
+    <p class="small">Connexion Google + clé ID (uniquement la première fois).</p>
+
+    <!-- 🔒 Zone login -->
+    <div id="gate" class="card">
+      <div class="row">
+        <button id="btnGoogle" class="btn btnPrimary" type="button">Se connecter avec Google</button>
+        <button id="btnLogout" class="btn btnGhost" type="button" style="display:none;">Se déconnecter</button>
+      </div>
+
+      <div id="who" class="small" style="margin-top:10px;"></div>
+
+      <!-- clé seulement si pas joueur -->
+      <div id="keyBox" style="display:none; margin-top:14px;">
+        <div class="small" style="margin-bottom:8px;">Première connexion : entre la clé fournie par le staff.</div>
+        <input id="playerKey" placeholder="Ex: NEWINN-1A7F-9KQ2" />
+        <button id="btnValidateKey" class="btn btnGhost" type="button" style="margin-top:10px;">Valider la clé</button>
+        <div id="msg" class="small" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- ✅ Options visibles seulement si joueur -->
+    <div id="playerArea" class="card" style="display:none;">
+      <h2 style="margin:0 0 10px 0;">Options joueurs</h2>
+      <div class="small" style="margin-bottom:10px;">Tu peux rajouter ici d’autres trucs plus tard.</div>
+
+      <div class="row">
+        <button class="btn btnPrimary" onclick="window.location.href='entrainement.html'">
+          Entraînement (présence)
+        </button>
+
+        <!-- exemples d’options futures -->
+        <button class="btn btnGhost" type="button" disabled>
+          Stats (bientôt)
+        </button>
+        <button class="btn btnGhost" type="button" disabled>
+          Messages (bientôt)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import {
+      getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    // ✅ COLLE TON firebaseConfig ICI
+     const firebaseConfig = {
+    apiKey: "AIzaSyAsBNy5Sz5IYQO4pi2y40-dez_oKQxpzMc",
+    authDomain: "fc-newinn.firebaseapp.com",
+    projectId: "fc-newinn",
+    storageBucket: "fc-newinn.firebasestorage.app",
+    messagingSenderId: "780192772083",
+    appId: "1:780192772083:web:4529bffdae60d88a8c2c86",
+    measurementId: "G-567TZ0NDER"
+  };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const btnGoogle = document.getElementById("btnGoogle");
+    const btnLogout = document.getElementById("btnLogout");
+    const who = document.getElementById("who");
+
+    const keyBox = document.getElementById("keyBox");
+    const playerKey = document.getElementById("playerKey");
+    const btnValidateKey = document.getElementById("btnValidateKey");
+    const msg = document.getElementById("msg");
+
+    const playerArea = document.getElementById("playerArea");
+
+    async function isPlayer(uid){
+      const snap = await getDoc(doc(db, "players", uid));
+      return snap.exists();
+    }
+
+    async function consumeKeyAndRegister(uid, email, key){
+      const keyRef = doc(db, "invites", key);
+      const keySnap = await getDoc(keyRef);
+
+      if(!keySnap.exists()) throw new Error("Clé inconnue.");
+      const data = keySnap.data();
+      if(data.used === true) throw new Error("Clé déjà utilisée.");
+
+      await updateDoc(keyRef, {
+        used: true,
+        usedBy: uid,
+        usedAt: serverTimestamp()
+      });
+
+      await setDoc(doc(db, "players", uid), {
+        email: email || "",
+        createdAt: serverTimestamp()
+      });
+    }
+
+    btnGoogle.addEventListener("click", async () => {
+      msg.textContent = "";
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    });
+
+    btnLogout.addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    btnValidateKey.addEventListener("click", async () => {
+      msg.textContent = "";
+      const user = auth.currentUser;
+      if(!user){ msg.textContent = "⚠️ Connecte-toi d’abord."; return; }
+
+      const key = (playerKey.value || "").trim();
+      if(!key){ msg.textContent = "⚠️ Entre une clé."; return; }
+
+      try{
+        btnValidateKey.disabled = true;
+        msg.textContent = "Validation…";
+        await consumeKeyAndRegister(user.uid, user.email, key);
+        msg.textContent = "✅ Validé !";
+        keyBox.style.display = "none";
+        playerArea.style.display = "block";
+      }catch(e){
+        msg.textContent = "❌ " + (e.message || "Erreur");
+      }finally{
+        btnValidateKey.disabled = false;
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if(!user){
+        who.textContent = "Non connecté.";
+        btnLogout.style.display = "none";
+        playerArea.style.display = "none";
+        keyBox.style.display = "none";
+        return;
+      }
+
+      who.textContent = "Connecté : " + (user.email || "");
+      btnLogout.style.display = "inline-flex";
+
+      const ok = await isPlayer(user.uid);
+      if(ok){
+        playerArea.style.display = "block";
+        keyBox.style.display = "none";
+      }else{
+        playerArea.style.display = "none";
+        keyBox.style.display = "block";
+        msg.textContent = "Première connexion : entre ta clé.";
+      }
+    });
+  </script>
+</body>
+</html>

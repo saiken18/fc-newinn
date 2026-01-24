@@ -132,8 +132,15 @@
 
 <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
         onclick="window.location.href='actus.html'">Actus</button>
-<button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
-        onclick="window.location.href='entrainement.html'">Entraînement</button>
+<button id="navTraining"
+  class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+  style="display:none;"
+  onclick="window.location.href='entrainement.html'">Entraînement</button>
+  <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+        onclick="window.location.href='joueurs.html'">
+  Espace joueurs
+</button>
+
       
 </nav>
 
@@ -154,7 +161,16 @@
         <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left" onclick="goTo('calendar')">Calendrier</button>
         <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left" onclick="goTo('contact')">Contact</button>
         <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left"onclick="window.location.href='actus.html'">Actus</button>
-       <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left" onclick="window.location.href='entrainement.html'">Entraînement</button>
+       <button id="navTrainingMobile"
+       class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left"
+       style="display:none;"
+       onclick="window.location.href='entrainement.html'">Entraînement</button>
+       <button class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition text-left"
+        onclick="window.location.href='joueurs.html'">
+  Espace joueurs
+</button>
+
+
       </div>
     </div>
   </header>
@@ -1425,6 +1441,44 @@ rowWrap.style.gap = isWideLine ? "6px" : "10px";
 
 </script>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  // ✅ COLLE EXACTEMENT la même config que dans entrainement.html
+   const firebaseConfig = {
+    apiKey: "AIzaSyAsBNy5Sz5IYQO4pi2y40-dez_oKQxpzMc",
+    authDomain: "fc-newinn.firebaseapp.com",
+    projectId: "fc-newinn",
+    storageBucket: "fc-newinn.firebasestorage.app",
+    messagingSenderId: "780192772083",
+    appId: "1:780192772083:web:4529bffdae60d88a8c2c86",
+    measurementId: "G-567TZ0NDER"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const navTraining = document.getElementById("navTraining");
+  const navTrainingMobile = document.getElementById("navTrainingMobile");
+
+  function hide(){
+    if(navTraining) navTraining.style.display = "none";
+    if(navTrainingMobile) navTrainingMobile.style.display = "none";
+  }
+  function show(){
+    if(navTraining) navTraining.style.display = "inline-flex";
+    if(navTrainingMobile) navTrainingMobile.style.display = "block";
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if(!user){ hide(); return; }
+    const snap = await getDoc(doc(db, "players", user.uid));
+    if(snap.exists()) show();
+    else hide();
+  });
+</script>
 
 
 </body>
