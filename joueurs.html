@@ -35,7 +35,7 @@
       </div>
 
       <div id="who" class="small" style="margin-top:10px;"></div>
-      <div id="authError" class="small" style="margin-top:10px; color:#ffb4b4; white-space:pre-wrap;"></div>
+      
 
 
 
@@ -109,29 +109,7 @@ import {
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const errEl = document.getElementById("authError");
-function logLine(line){
-  if (!errEl) return;
-  errEl.textContent += (errEl.textContent ? "\n" : "") + line;
-}
-
-// Toujours afficher le domaine
-logLine("ORIGIN = " + window.location.origin);
-
-// Persistance
-setPersistence(auth, browserLocalPersistence)
-  .then(() => logLine("✅ persistence OK"))
-  .catch((e) => {
-    console.error("Persistence error", e);
-    logLine("❌ persistence error: " + (e?.code || e?.message || e));
-  });
-
-
-
-
-
-
-
+setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 
 
@@ -178,17 +156,15 @@ setPersistence(auth, browserLocalPersistence)
 
 
   btnGoogle.addEventListener("click", async () => {
-  logLine("➡️ click login (popup)");
   const provider = new GoogleAuthProvider();
-
   try {
     await signInWithPopup(auth, provider);
-    logLine("✅ popup login OK");
   } catch (e) {
     console.error(e);
-    logLine("❌ popup error: " + (e?.code || e?.message || e));
+    msg.textContent = "❌ " + (e?.code || e?.message || "Erreur connexion Google");
   }
 });
+
 
 
 
