@@ -35,7 +35,8 @@
       </div>
 
       <div id="who" class="small" style="margin-top:10px;"></div>
-      <div id="authError" class="small" style="margin-top:10px; color:#ffb4b4;"></div>
+      <div id="authError" class="small" style="margin-top:10px; color:#ffb4b4; white-space:pre-wrap;"></div>
+
 
 
       <!-- clé seulement si pas joueur -->
@@ -109,34 +110,36 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const errEl = document.getElementById("authError");
-function showErr(t){
-  if (errEl) errEl.textContent = t || "";
+function logLine(line){
+  if (!errEl) return;
+  errEl.textContent += (errEl.textContent ? "\n" : "") + line;
 }
 
-// Affiche l’URL courante (super utile pour voir le domaine réel)
-showErr("Debug: " + window.location.origin);
+// Toujours afficher le domaine
+logLine("ORIGIN = " + window.location.origin);
 
-// 1) Persistance (si bloquée par navigateur / cookies / mode privé, on veut le voir)
+// Persistance
 setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    showErr("Debug: persistence OK — " + window.location.origin);
-  })
+  .then(() => logLine("✅ persistence OK"))
   .catch((e) => {
     console.error("Persistence error", e);
-    showErr("❌ persistence error: " + (e?.code || e?.message || e));
+    logLine("❌ persistence error: " + (e?.code || e?.message || e));
   });
 
-// 2) Résultat du redirect (si domaine non autorisé => auth/unauthorized-domain ici)
+// Résultat redirect
 getRedirectResult(auth)
   .then((res) => {
     if (res && res.user) {
-      showErr("✅ Redirect OK: " + (res.user.email || res.user.uid));
+      logLine("✅ redirect result user = " + (res.user.email || res.user.uid));
+    } else {
+      logLine("ℹ️ redirect result = none");
     }
   })
-  .catch((error) => {
-    console.error("Erreur redirect Google:", error);
-    showErr("❌ redirect error: " + (error?.code || error?.message || error));
+  .catch((e) => {
+    console.error("Redirect error", e);
+    logLine("❌ redirect error: " + (e?.code || e?.message || e));
   });
+
 
 
 
@@ -186,10 +189,12 @@ getRedirectResult(auth)
 }
 
 
-   btnGoogle.addEventListener("click", async () => {
+  btnGoogle.addEventListener("click", async () => {
+  logLine("➡️ click login");
   const provider = new GoogleAuthProvider();
   await signInWithRedirect(auth, provider);
 });
+
 
 
 
@@ -220,6 +225,7 @@ getRedirectResult(auth)
     });
 
     onAuthStateChanged(auth, async (user) => {
+         logLine("onAuthStateChanged user = " + (user ? (user.email || user.uid) : "null"));
       if(!user){
         who.textContent = "Non connecté.";
         btnLogout.style.display = "none";
