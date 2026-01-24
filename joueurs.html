@@ -35,6 +35,8 @@
       </div>
 
       <div id="who" class="small" style="margin-top:10px;"></div>
+      <div id="authError" class="small" style="margin-top:10px; color:#ffb4b4;"></div>
+
 
       <!-- clé seulement si pas joueur -->
       <div id="keyBox" style="display:none; margin-top:14px;">
@@ -111,9 +113,10 @@ setPersistence(auth, browserLocalPersistence)
 
 getRedirectResult(auth).catch((error) => {
   console.error("Erreur redirect Google:", error);
-  const msgEl = document.getElementById("msg");
-  if (msgEl) msgEl.textContent = "❌ " + (error?.code || error?.message || "Erreur Google");
+  const errEl = document.getElementById("authError");
+  if (errEl) errEl.textContent = "❌ " + (error?.code || error?.message || "Erreur Google");
 });
+
 
 
 
