@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FC Newinn — Entraînement</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:#0b0b0d;
+      color:#fff;
+    }
+    .page{
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+    a{ color:#fff; text-decoration:none; opacity:.9; }
+    a:hover{ opacity:1; }
+
+    h1{ margin: 12px 0 6px; font-size: 32px; }
+    .sub{ margin:0 0 16px; opacity:.75; }
+
+    .card{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      border-radius: 18px;
+      overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .hero{
+      padding: 16px;
+      background:
+        linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.75)),
+        radial-gradient(circle at 20% 0%, rgba(255,60,60,.25), transparent 55%);
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .hero .kicker{ font-size: 12px; opacity:.75; }
+    .hero .title{ margin: 6px 0 0; font-size: 20px; font-weight: 900; }
+    .hero .meta{ margin-top: 8px; opacity:.85; }
+
+    .body{
+      padding: 16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .chips{ display:flex; flex-wrap:wrap; gap:10px; }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-size: 14px;
+      opacity:.95;
+    }
+
+    .btnRow{ display:flex; gap:12px; flex-wrap:wrap; margin-top: 4px; }
+    .btn{
+      display:inline-block;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 900;
+      text-decoration:none;
+    }
+    .btnPrimary{ background:#ff3c3c; color:#000; }
+    .btnGhost{
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+    }
+
+    .small{ font-size: 12px; opacity:.6; line-height: 1.4; }
+
+    .table{
+  width:100%;
+  border-collapse: collapse;
+  min-width: 520px;
+}
+.table th, .table td{
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  text-align:left;
+  font-size: 14px;
+}
+.table th{
+  opacity:.75;
+  font-size: 12px;
+  letter-spacing:.02em;
+}
+.badgeStatus{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  font-weight: 900;
+  font-size: 12px;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <a href="index.html">← Retour au site</a>
+
+    <h1>Entraînement</h1>
+    <p class="sub">Confirme ta présence pour l'organisation de l'entrainement.</p>
+
+    <div class="card">
+      <div class="hero">
+        <div class="kicker">Prochain entraînement</div>
+        <div class="title" id="trainingTitle">Mardi 26 janvier 2026</div>
+        <div class="meta" id="trainingTime">19:30 — 21:30</div>
+      </div>
+
+      <div class="body">
+        <div class="chips">
+          <span class="chip">📅 <span id="trainingDateChip">26/01/2026</span></span>
+          <span class="chip">⏰ <span>19:30 → 21:30</span></span>
+          <span class="chip">📍 <span id="trainingPlace">Kraainem (terrain)</span></span>
+        </div>
+
+        <div class="btnRow">
+          <!-- ✅ Remplace le lien par TON Google Form -->
+          <a class="btn btnPrimary" id="trainingFormLink" href="#" target="_blank">
+            Je confirme ma présence
+          </a>
+
+          <a class="btn btnGhost" href="calendar.html" style="display:none;">(option)</a>
+        </div>
+
+        <p class="small">
+          Astuce : on va utiliser un Google Form pour les présences (1 réponse par personne).
+          Plus tard, on passera ça dans un espace joueurs avec login.
+        </p>
+      </div>
+    </div>
+    <!-- ✅ Tableau présences -->
+<div class="card" style="margin-top:14px;">
+  <div class="hero">
+    <div class="kicker">Présences</div>
+    <div class="title">Qui est dispo ?</div>
+    <div class="meta">Mis à jour automatiquement via le Google Form</div>
+  </div>
+
+  <div class="body">
+    <div id="attendanceInfo" class="small">Chargement…</div>
+
+    <div style="overflow:auto; margin-top:10px;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Joueur</th>
+            <th>Statut</th>
+            <th>Commentaire</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <script>
+    // ✅ Ici tu peux modifier la date si besoin
+    const nextTraining = {
+      dateISO: "2026-01-26",     // prochain entraînement (tu m’as dit 26 janv 2026)
+      start: "19:30",
+      end: "21:30",
+      place: "Kraainem (terrain)",
+      formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSdT8l7sATaU_67K4Smqk6HQPZWu6XTBrpgKWqF1icpAGIW9-Q/viewform?usp=dialog"
+    };
+
+    // Remplissage UI
+    document.getElementById("trainingTitle").textContent = "Mardi 26 janvier 2026";
+    document.getElementById("trainingTime").textContent = `${nextTraining.start} — ${nextTraining.end}`;
+    document.getElementById("trainingDateChip").textContent = "26/01/2026";
+    document.getElementById("trainingPlace").textContent = nextTraining.place;
+
+    // Lien formulaire
+    const a = document.getElementById("trainingFormLink");
+    a.href = nextTraining.formUrl;
+    if(nextTraining.formUrl.includes("PASTE_GOOGLE_FORM_URL_HERE")){
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        alert("Le formulaire n’est pas encore configuré. Remplace PASTE_GOOGLE_FORM_URL_HERE par ton lien Google Form.");
+      });
+    }
+    // ✅ Lien Google Sheet -> JSON (évite les problèmes CORS sur GitHub Pages)
+// ⚠️ IMPORTANT : le nom d’onglet doit être EXACT
+const SHEET_JSON_URL =
+  "https://opensheet.elk.sh/1n5MQevxXlY2yquxTcA5C_xBhXcyhcB3x66evhWhMp3c/Responses";
+
+// ✅ Liste des joueurs (comme ton site)
+const roster = [
+  "Loic Vanderlinden",
+  "Baptiste Doupagne",
+  "Maxime Vanderlinden",
+  "Noah Ceuppers",
+  "Emmanuel",
+  "Sami Ouartan",
+  "Sami",
+  "Rodolphe",
+  "Matteo",
+  "Polat",
+  "Ariel",
+  "Arthur Rollier",
+  "Thomas Mathieu (Capitaine)",
+  "Adam",
+  "Théo Marchal",
+  "Julien Marchal",
+  "Audry Changoluiza",
+  "Romain Marchal",
+  "Ahmed Alouini",
+  "Jodel Kaze Ntibarufata",
+  "Nolan",
+  "Diego Gomez",
+  "Kevin Corrales",
+  "Mohammed Amine Amara"
+];
+
+function normName(s){
+  return (s || "").toLowerCase().trim();
+}
+
+function statusBadge(status){
+  const st = (status || "").toLowerCase();
+  if(st.includes("dispo") || st.includes("prés") || st.includes("present")) return `✅ <span class="badgeStatus">Présent</span>`;
+  if(st.includes("pas dispo") || st.includes("abs")) return `❌ <span class="badgeStatus">Absent</span>`;
+  if(st.includes("ret") || st.includes("en retard")) return `⏳ <span class="badgeStatus">En retard</span>`;
+  return `— <span class="badgeStatus" style="opacity:.65;">Pas répondu</span>`;
+}
+
+async function loadAttendance(){
+  const info = document.getElementById("attendanceInfo");
+  const tbody = document.getElementById("attendanceBody");
+
+  if(!SHEET_JSON_URL){
+    info.textContent = "⚠️ Lien Sheet non configuré.";
+    return;
+  }
+
+  try{
+    const bust = (SHEET_JSON_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
+    const res = await fetch(SHEET_JSON_URL + bust, { cache: "no-store" });
+
+    if(!res.ok){
+      throw new Error("HTTP " + res.status);
+    }
+
+    const rows = await res.json();
+
+    const latestByName = new Map();
+
+    rows.forEach(r => {
+      const name =
+        r["Nom + prénom"] || r["Nom"] || r["Nom et prénom"] || r["Nom & prénom"] || r["Prénom"] || "";
+
+      const status =
+        r["disponibilités prochain entrainement"] || r["Statut"] || r["Présence"] || r["Disponible ?"] || "";
+
+      const comment =
+        r["Commentaire"] || r["Remarque"] || "";
+
+      const key = normName(name);
+      if(!key) return;
+
+      latestByName.set(key, { name, status, comment });
+    });
+
+    tbody.innerHTML = "";
+
+    roster.forEach(player => {
+      const key = normName(player);
+      let found = latestByName.get(key);
+
+      if(!found){
+        for(const [k,v] of latestByName.entries()){
+          if(k === key) { found = v; break; }
+          if(k.includes(key) || key.includes(k)) { found = v; break; }
+        }
+      }
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="font-weight:800;">${player}</td>
+        <td>${statusBadge(found?.status)}</td>
+        <td style="opacity:.85;">${found?.comment ? found.comment : "—"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    info.textContent = `OK — ${latestByName.size} réponse(s) reçue(s).`;
+  }catch(e){
+    info.textContent = "❌ Impossible de charger les réponses (onglet Sheets / accès).";
+  }
+}
+
+loadAttendance();
+
+  </script>
+</body>
+</html>
