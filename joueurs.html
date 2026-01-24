@@ -196,7 +196,7 @@ setPersistence(auth, browserLocalPersistence).catch(console.error);
     });
 
     onAuthStateChanged(auth, async (user) => {
-        logLine("onAuthStateChanged user = " + (user ? (user.email || user.uid) : "null"));
+        
       if(!user){
         who.textContent = "Non connecté.";
         btnLogout.style.display = "none";
