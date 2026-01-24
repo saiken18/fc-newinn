@@ -164,18 +164,14 @@
         </div>
 
         <div class="btnRow">
-          <!-- ✅ Remplace le lien par TON Google Form -->
-          <a class="btn btnPrimary" id="trainingFormLink" href="#" target="_blank">
-            Je confirme ma présence
-          </a>
+  <button id="btnDispo" class="btn btnPrimary" type="button">✅ Dispo</button>
+  <button id="btnIndispo" class="btn btnGhost" type="button">❌ Pas dispo</button>
+  <button id="btnReset" class="btn btnGhost" type="button">↩️ Annuler</button>
+</div>
 
-          <a class="btn btnGhost" href="calendar.html" style="display:none;">(option)</a>
-        </div>
+<p id="myStatus" class="small"></p>
+<p id="whoAmI" class="small"></p>
 
-        <p class="small">
-          Astuce : on va utiliser un Google Form pour les présences (1 réponse par personne).
-          Plus tard, on passera ça dans un espace joueurs avec login.
-        </p>
       </div>
     </div>
     <!-- ✅ Tableau présences -->
@@ -183,7 +179,7 @@
   <div class="hero">
     <div class="kicker">Présences</div>
     <div class="title">Qui est dispo ?</div>
-    <div class="meta">Mis à jour automatiquement via le Google Form</div>
+    <div class="meta">Mis à jour automatiquement par les joueurs</div>
   </div>
 
   <div class="body">
@@ -195,7 +191,7 @@
           <tr>
             <th>Joueur</th>
             <th>Statut</th>
-            <th>Commentaire</th>
+            <th>Mis à jour</th>
           </tr>
         </thead>
         <tbody id="attendanceBody"></tbody>
@@ -207,164 +203,7 @@
   </div> <!-- fin #playerOnly -->
   </div>
 
-  <script>
-    // ✅ Ici tu peux modifier la date si besoin
-    const nextTraining = {
-      dateISO: "2026-01-26",     // prochain entraînement (tu m’as dit 26 janv 2026)
-      start: "19:30",
-      end: "21:30",
-      place: "Kraainem (terrain)",
-      formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSdT8l7sATaU_67K4Smqk6HQPZWu6XTBrpgKWqF1icpAGIW9-Q/viewform?usp=dialog"
-    };
-
-    // Remplissage UI
-    document.getElementById("trainingTitle").textContent = "Mardi 26 janvier 2026";
-    document.getElementById("trainingTime").textContent = `${nextTraining.start} — ${nextTraining.end}`;
-    document.getElementById("trainingDateChip").textContent = "26/01/2026";
-    document.getElementById("trainingPlace").textContent = nextTraining.place;
-
-    // Lien formulaire
-    const a = document.getElementById("trainingFormLink");
-    a.href = nextTraining.formUrl;
-    if(nextTraining.formUrl.includes("PASTE_GOOGLE_FORM_URL_HERE")){
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        alert("Le formulaire n’est pas encore configuré. Remplace PASTE_GOOGLE_FORM_URL_HERE par ton lien Google Form.");
-      });
-    }
-    // ✅ Lien Google Sheet -> JSON (évite les problèmes CORS sur GitHub Pages)
-// ⚠️ IMPORTANT : le nom d’onglet doit être EXACT
-const SHEET_ID = "1n5MQevxXlY2yquxTcA5C_xBhXcyhcB3x66evhWhMp3c";
-const SHEET_TAB = "Responses"; // le nom de ton onglet (tu l'as renommé)
-const GVIZ_URL =
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_TAB)}`;
-
-
-// ✅ Liste des joueurs (comme ton site)
-const roster = [
-  "Loic Vanderlinden",
-  "Baptiste Doupagne",
-  "Maxime Vanderlinden",
-  "Noah Ceuppers",
-  "Emmanuel",
-  "Sami Ouartan",
-  "Sami",
-  "Rodolphe",
-  "Matteo",
-  "Polat",
-  "Ariel",
-  "Arthur Rollier",
-  "Thomas Mathieu (Capitaine)",
-  "Adam",
-  "Théo Marchal",
-  "Julien Marchal",
-  "Audry Changoluiza",
-  "Romain Marchal",
-  "Ahmed Alouini",
-  "Jodel Kaze Ntibarufata",
-  "Nolan",
-  "Diego Gomez",
-  "Kevin Corrales",
-  "Mohammed Amine Amara"
-];
-
-function normName(s){
-  return (s || "").toLowerCase().trim();
-}
-
-function statusBadge(status){
-  const st = (status || "").toLowerCase();
-  if(st.includes("dispo") || st.includes("prés") || st.includes("present")) return `✅ <span class="badgeStatus">Présent</span>`;
-  if(st.includes("pas dispo") || st.includes("abs")) return `❌ <span class="badgeStatus">Absent</span>`;
-  if(st.includes("ret") || st.includes("en retard")) return `⏳ <span class="badgeStatus">En retard</span>`;
-  return `— <span class="badgeStatus" style="opacity:.65;">Pas répondu</span>`;
-}
-
-async function loadAttendance(){
-  const info = document.getElementById("attendanceInfo");
-  const tbody = document.getElementById("attendanceBody");
-
-  if(!GVIZ_URL){
-  info.textContent = "⚠️ Lien Sheet non configuré.";
-  return;
-}
-
-  try{
-    const bust = (GVIZ_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
-const res = await fetch(GVIZ_URL + bust, { cache: "no-store" });
-
-if(!res.ok){
-  throw new Error("HTTP " + res.status);
-}
-
-const text = await res.text();
-
-// Google renvoie un truc du style: google.visualization.Query.setResponse({...});
-const start = text.indexOf("{");
-const end = text.lastIndexOf("}") + 1;
-const data = JSON.parse(text.substring(start, end));
-
-const cols = data.table.cols.map(c => (c.label || "").trim());
-const rows = (data.table.rows || []).map(r => {
-  const obj = {};
-  r.c.forEach((cell, i) => {
-    obj[cols[i]] = cell ? cell.v : "";
-  });
-  return obj;
-});
-
-    const latestByName = new Map();
-
-    rows.forEach(r => {
-      const name =
-       r["nom + prenom"] || r["nom + prenom "] || r["Nom + prénom"] || r["Nom"] || "";
-
-      const status =
-       r["disponibilités prochain entrainement"] || r["disponibilités prochain entraînement"] || r["Statut"] || "";
-
-      const comment =
-       r["Commentaire"] || r["Remarque"] || "";
-
-
-      const key = normName(name);
-      if(!key) return;
-
-      latestByName.set(key, { name, status, comment });
-    });
-
-    tbody.innerHTML = "";
-
-    roster.forEach(player => {
-      const key = normName(player);
-      let found = latestByName.get(key);
-
-      if(!found){
-        for(const [k,v] of latestByName.entries()){
-          if(k === key) { found = v; break; }
-          if(k.includes(key) || key.includes(k)) { found = v; break; }
-        }
-      }
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td style="font-weight:800;">${player}</td>
-        <td>${statusBadge(found?.status)}</td>
-        <td style="opacity:.85;">${found?.comment ? found.comment : "—"}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    info.textContent = `OK — ${latestByName.size} réponse(s) reçue(s).`;
-  }catch(e){
-    console.error(e);
-    info.textContent = `❌ Impossible de charger les réponses (${e.message || e}).`;
-
-  }
-}
-
-loadAttendance();
-
-  </script>
+  
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import {
@@ -373,21 +212,25 @@ loadAttendance();
     signInWithPopup,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import {
-    getFirestore,
-    doc,
-    getDoc,
-    setDoc,
-    updateDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+ import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  collection,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
 
   // ✅ ICI tu colles TON firebaseConfig
   const firebaseConfig = {
     apiKey: "AIzaSyAsBNy5Sz5IYQO4pi2y40-dez_oKQxpzMc",
     authDomain: "fc-newinn.firebaseapp.com",
     projectId: "fc-newinn",
-    storageBucket: "fc-newinn.firebasestorage.app",
+    storageBucket: "fc-newinn.appspot.com",
     messagingSenderId: "780192772083",
     appId: "1:780192772083:web:4529bffdae60d88a8c2c86",
     measurementId: "G-567TZ0NDER"
@@ -405,6 +248,25 @@ loadAttendance();
   const playerKey = document.getElementById("playerKey");
   const btnValidateKey = document.getElementById("btnValidateKey");
   const gateMsg = document.getElementById("gateMsg");
+
+  // --- UI entraînement ---
+const btnDispo = document.getElementById("btnDispo");
+const btnIndispo = document.getElementById("btnIndispo");
+const btnReset = document.getElementById("btnReset");
+const myStatus = document.getElementById("myStatus");
+const whoAmI = document.getElementById("whoAmI");
+
+const trainingTitle = document.getElementById("trainingTitle");
+const trainingTime = document.getElementById("trainingTime");
+const trainingDateChip = document.getElementById("trainingDateChip");
+const trainingPlace = document.getElementById("trainingPlace");
+
+const attendanceInfo = document.getElementById("attendanceInfo");
+const attendanceBody = document.getElementById("attendanceBody");
+
+// Toujours la séance d’après
+const SESSION_ID = "next";
+
 
   function showPlayerContent(){
     loginGate.style.display = "none";
@@ -435,11 +297,88 @@ loadAttendance();
       usedAt: serverTimestamp()
     });
 
-    await setDoc(doc(db, "players", uid), {
-      email: email || "",
-      createdAt: serverTimestamp()
-    });
+   await setDoc(doc(db, "players", uid), {
+  email: email || "",
+  name: data.playerName || "",
+  keyId: key,
+  createdAt: serverTimestamp()
+});
+
   }
+  function fmtDate(iso){
+  const [y,m,d] = (iso || "").split("-");
+  if(!y) return "";
+  return `${d}/${m}/${y}`;
+}
+
+function fmtTime(ts){
+  try{
+    const d = ts.toDate();
+    return d.toLocaleString("fr-FR", { dateStyle:"short", timeStyle:"short" });
+  }catch{ return ""; }
+}
+
+async function loadMyPlayerName(uid){
+  const snap = await getDoc(doc(db, "players", uid));
+  return snap.exists() ? (snap.data().name || "") : "";
+}
+
+async function setMyStatus(uid, email, name, status){
+  const ref = doc(db, "sessions", SESSION_ID, "responses", uid);
+  await setDoc(ref, {
+    status, // "dispo" | "indispo"
+    email: email || "",
+    name: name || "",
+    updatedAt: serverTimestamp()
+  }, { merge:true });
+}
+
+async function resetMyStatus(uid){
+  await deleteDoc(doc(db, "sessions", SESSION_ID, "responses", uid));
+}
+
+function renderRows(rows){
+  const dispo = rows.filter(r => r.status === "dispo");
+  const indispo = rows.filter(r => r.status === "indispo");
+
+  attendanceInfo.textContent =
+    `${dispo.length} dispo — ${indispo.length} pas dispo — ${rows.length} réponses`;
+
+  rows.sort((a,b) => {
+    const sa = a.status === "dispo" ? 0 : 1;
+    const sb = b.status === "dispo" ? 0 : 1;
+    if(sa !== sb) return sa - sb;
+    return (a.name || a.email || "").localeCompare(b.name || b.email || "");
+  });
+
+  attendanceBody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${(r.name || r.email || "Joueur")}</td>
+      <td><span class="badgeStatus">${r.status === "dispo" ? "✅ Dispo" : "❌ Pas dispo"}</span></td>
+      <td>${r.updatedAt ? fmtTime(r.updatedAt) : ""}</td>
+    </tr>
+  `).join("") || `<tr><td colspan="3" style="opacity:.7;">Aucune réponse pour l’instant.</td></tr>`;
+}
+
+function listenSession(){
+  onSnapshot(doc(db, "sessions", SESSION_ID), (snap) => {
+    if(!snap.exists()) return;
+    const s = snap.data();
+
+    trainingTitle.textContent = s.title || "Prochain entraînement";
+    trainingTime.textContent = `${s.start || ""} — ${s.end || ""}`;
+    trainingDateChip.textContent = fmtDate(s.dateISO || "");
+    trainingPlace.textContent = s.place || "";
+  });
+}
+
+function listenResponses(){
+  onSnapshot(collection(db, "sessions", SESSION_ID, "responses"), (snap) => {
+    const rows = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderRows(rows);
+  });
+}
+
 
   btnGoogle.addEventListener("click", async () => {
     gateMsg.textContent = "";
@@ -478,19 +417,47 @@ loadAttendance();
     if(!user){
       showGate();
       keyBox.style.display = "none";
+      btnDispo.disabled = true;
+      btnIndispo.disabled = true;
+      btnReset.disabled = true;
+
       return;
     }
 
     const ok = await isPlayer(user.uid);
-    if(ok){
-      showPlayerContent();
-    }else{
-      showGate();
-      keyBox.style.display = "block";
-      gateMsg.textContent = "Connecté: " + (user.email || "") + " — Entre ta clé.";
-    }
+   if(ok){
+  showPlayerContent();
+
+  // Affiche "Connecté : NOM — email"
+  const playerName = await loadMyPlayerName(user.uid);
+  whoAmI.textContent = `Connecté : ${playerName ? playerName + " — " : ""}${user.email || ""}`;
+
+  // Active les boutons
+  btnDispo.disabled = false;
+  btnIndispo.disabled = false;
+  btnReset.disabled = false;
+
+  btnDispo.onclick = async () => {
+    await setMyStatus(user.uid, user.email, playerName, "dispo");
+    myStatus.textContent = "Ton statut : ✅ Dispo";
+  };
+  btnIndispo.onclick = async () => {
+    await setMyStatus(user.uid, user.email, playerName, "indispo");
+    myStatus.textContent = "Ton statut : ❌ Pas dispo";
+  };
+  btnReset.onclick = async () => {
+    await resetMyStatus(user.uid);
+    myStatus.textContent = "Ton statut : (aucune réponse)";
+  };
+
+  // Lance l’écoute en live
+  listenSession();
+  listenResponses();
+}
+
   });
 </script>
+
 
   
 </body>
