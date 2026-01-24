@@ -75,13 +75,13 @@
 import {
   getAuth,
   GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   onAuthStateChanged,
   signOut,
   setPersistence,
   browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
 
 import {
   getFirestore,
@@ -126,19 +126,7 @@ setPersistence(auth, browserLocalPersistence)
     logLine("❌ persistence error: " + (e?.code || e?.message || e));
   });
 
-// Résultat redirect
-getRedirectResult(auth)
-  .then((res) => {
-    if (res && res.user) {
-      logLine("✅ redirect result user = " + (res.user.email || res.user.uid));
-    } else {
-      logLine("ℹ️ redirect result = none");
-    }
-  })
-  .catch((e) => {
-    console.error("Redirect error", e);
-    logLine("❌ redirect error: " + (e?.code || e?.message || e));
-  });
+
 
 
 
@@ -190,9 +178,16 @@ getRedirectResult(auth)
 
 
   btnGoogle.addEventListener("click", async () => {
-  logLine("➡️ click login");
+  logLine("➡️ click login (popup)");
   const provider = new GoogleAuthProvider();
-  await signInWithRedirect(auth, provider);
+
+  try {
+    await signInWithPopup(auth, provider);
+    logLine("✅ popup login OK");
+  } catch (e) {
+    console.error(e);
+    logLine("❌ popup error: " + (e?.code || e?.message || e));
+  }
 });
 
 
@@ -225,7 +220,7 @@ getRedirectResult(auth)
     });
 
     onAuthStateChanged(auth, async (user) => {
-         logLine("onAuthStateChanged user = " + (user ? (user.email || user.uid) : "null"));
+        logLine("onAuthStateChanged user = " + (user ? (user.email || user.uid) : "null"));
       if(!user){
         who.textContent = "Non connecté.";
         btnLogout.style.display = "none";
