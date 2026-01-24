@@ -250,10 +250,10 @@ async function loadAttendance(){
   const info = document.getElementById("attendanceInfo");
   const tbody = document.getElementById("attendanceBody");
 
-  if(!SHEET_JSON_URL){
-    info.textContent = "⚠️ Lien Sheet non configuré.";
-    return;
-  }
+  if(!GVIZ_URL){
+  info.textContent = "⚠️ Lien Sheet non configuré.";
+  return;
+}
 
   try{
     const bust = (GVIZ_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
