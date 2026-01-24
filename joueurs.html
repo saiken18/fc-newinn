@@ -98,7 +98,7 @@ import {
     apiKey: "AIzaSyAsBNy5Sz5IYQO4pi2y40-dez_oKQxpzMc",
     authDomain: "fc-newinn.firebaseapp.com",
     projectId: "fc-newinn",
-    storageBucket: "fc-newinn.firebasestorage.app",
+   storageBucket: "fc-newinn.appspot.com",
     messagingSenderId: "780192772083",
     appId: "1:780192772083:web:4529bffdae60d88a8c2c86",
     measurementId: "G-567TZ0NDER"
@@ -108,14 +108,36 @@ import {
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-setPersistence(auth, browserLocalPersistence)
-  .catch((e) => console.error("Persistence error", e));
+const errEl = document.getElementById("authError");
+function showErr(t){
+  if (errEl) errEl.textContent = t || "";
+}
 
-getRedirectResult(auth).catch((error) => {
-  console.error("Erreur redirect Google:", error);
-  const errEl = document.getElementById("authError");
-  if (errEl) errEl.textContent = "❌ " + (error?.code || error?.message || "Erreur Google");
-});
+// Affiche l’URL courante (super utile pour voir le domaine réel)
+showErr("Debug: " + window.location.origin);
+
+// 1) Persistance (si bloquée par navigateur / cookies / mode privé, on veut le voir)
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    showErr("Debug: persistence OK — " + window.location.origin);
+  })
+  .catch((e) => {
+    console.error("Persistence error", e);
+    showErr("❌ persistence error: " + (e?.code || e?.message || e));
+  });
+
+// 2) Résultat du redirect (si domaine non autorisé => auth/unauthorized-domain ici)
+getRedirectResult(auth)
+  .then((res) => {
+    if (res && res.user) {
+      showErr("✅ Redirect OK: " + (res.user.email || res.user.uid));
+    }
+  })
+  .catch((error) => {
+    console.error("Erreur redirect Google:", error);
+    showErr("❌ redirect error: " + (error?.code || error?.message || error));
+  });
+
 
 
 
