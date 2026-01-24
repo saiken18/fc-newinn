@@ -200,8 +200,11 @@
     }
     // ✅ Lien Google Sheet -> JSON (évite les problèmes CORS sur GitHub Pages)
 // ⚠️ IMPORTANT : le nom d’onglet doit être EXACT
-const SHEET_JSON_URL =
-  "https://opensheet.elk.sh/1n5MQevxXlY2yquxTcA5C_xBhXcyhcB3x66evhWhMp3c/Responses";
+const SHEET_ID = "1n5MQevxXlY2yquxTcA5C_xBhXcyhcB3x66evhWhMp3c";
+const SHEET_TAB = "Responses"; // le nom de ton onglet (tu l'as renommé)
+const GVIZ_URL =
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_TAB)}`;
+
 
 // ✅ Liste des joueurs (comme ton site)
 const roster = [
@@ -253,26 +256,41 @@ async function loadAttendance(){
   }
 
   try{
-    const bust = (SHEET_JSON_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
-    const res = await fetch(SHEET_JSON_URL + bust, { cache: "no-store" });
+    const bust = (GVIZ_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
+const res = await fetch(GVIZ_URL + bust, { cache: "no-store" });
 
-    if(!res.ok){
-      throw new Error("HTTP " + res.status);
-    }
+if(!res.ok){
+  throw new Error("HTTP " + res.status);
+}
 
-    const rows = await res.json();
+const text = await res.text();
+
+// Google renvoie un truc du style: google.visualization.Query.setResponse({...});
+const start = text.indexOf("{");
+const end = text.lastIndexOf("}") + 1;
+const data = JSON.parse(text.substring(start, end));
+
+const cols = data.table.cols.map(c => (c.label || "").trim());
+const rows = (data.table.rows || []).map(r => {
+  const obj = {};
+  r.c.forEach((cell, i) => {
+    obj[cols[i]] = cell ? cell.v : "";
+  });
+  return obj;
+});
 
     const latestByName = new Map();
 
     rows.forEach(r => {
       const name =
-        r["Nom + prénom"] || r["Nom"] || r["Nom et prénom"] || r["Nom & prénom"] || r["Prénom"] || "";
+       r["nom + prenom"] || r["nom + prenom "] || r["Nom + prénom"] || r["Nom"] || "";
 
       const status =
-        r["disponibilités prochain entrainement"] || r["Statut"] || r["Présence"] || r["Disponible ?"] || "";
+       r["disponibilités prochain entrainement"] || r["disponibilités prochain entraînement"] || r["Statut"] || "";
 
       const comment =
-        r["Commentaire"] || r["Remarque"] || "";
+       r["Commentaire"] || r["Remarque"] || "";
+
 
       const key = normName(name);
       if(!key) return;
@@ -304,7 +322,9 @@ async function loadAttendance(){
 
     info.textContent = `OK — ${latestByName.size} réponse(s) reçue(s).`;
   }catch(e){
-    info.textContent = "❌ Impossible de charger les réponses (onglet Sheets / accès).";
+    console.error(e);
+    info.textContent = `❌ Impossible de charger les réponses (${e.message || e}).`;
+
   }
 }
 
