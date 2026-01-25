@@ -214,17 +214,20 @@
 <div class="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6 max-w-xl">
   <p class="text-white/60 text-xs mb-2">Prochain match</p>
 
-  <p class="text-xl font-black">
-    NEW INN FC 1 <span class="text-white/40">vs</span> CHIEFS WSL 2
-  </p>
+ <p class="text-xl font-black">
+  <span id="nmHome">NEW INN FC 1</span>
+  <span class="text-white/40">vs</span>
+  <span id="nmAway">—</span>
+</p>
 
-  <p class="text-white/70 text-sm mt-2">
-    Samedi 24 janvier 2026 — 15:30
-  </p>
+<p class="text-white/70 text-sm mt-2" id="nmWhen">
+  —
+</p>
 
-  <p class="text-white/60 text-sm">
-    ✈️ Extérieur — Avenue Jean-François De Becker 60, 1200 Woluwé-Saint-Lambert (Terrain 3A)
-  </p>
+<p class="text-white/60 text-sm" id="nmWhere">
+  —
+</p>
+
 
   <div class="mt-4 flex flex-wrap items-center gap-3">
   <span
@@ -441,8 +444,10 @@
         </p>
       </div>
       <button class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 transition border border-white/10 text-sm"
-        onclick="refreshRanking()">
-        Mettre à jour (manuel)
+       onclick="window.loadAbssaData()"
+      class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition"
+       >
+      🔄 Reload Firestore
       </button>
     </div>
 
@@ -549,209 +554,15 @@
 ];
 
 
-  let rankingData = [
-    { rank: 1, team: "MACCABI BXL", J: 15, G: 10, P: 4, N: 1, BP: 48, BC: 22, PTS: 31 },
-    { rank: 2, team: "CURTIS L'AUSELE", J: 15, G: 10, P: 5, N: 0, BP: 42, BC: 23, PTS: 30 },
-    { rank: 3, team: "CHIEFS WSL 2", J: 15, G: 8, P: 3, N: 4, BP: 42, BC: 33, PTS: 28 },
-    { rank: 4, team: "VOGELPIK FC.", J: 15, G: 8, P: 4, N: 3, BP: 27, BC: 23, PTS: 27 },
-    { rank: 5, team: "CHOULE AUDERGHEM 2", J: 14, G: 7, P: 3, N: 4, BP: 38, BC: 22, PTS: 25 },
-    { rank: 6, team: "IRLANDE FC 3", J: 15, G: 6, P: 4, N: 5, BP: 29, BC: 24, PTS: 23 },
-    { rank: 7, team: "SYB RFC", J: 14, G: 6, P: 5, N: 3, BP: 22, BC: 16, PTS: 21 },
-    { rank: 8, team: "GAST FC 1", J: 15, G: 5, P: 7, N: 3, BP: 26, BC: 42, PTS: 18 },
-    { rank: 9, team: "ITT - CLAUDY FC 1", J: 15, G: 4, P: 8, N: 3, BP: 26, BC: 41, PTS: 15 },
-    { rank: 10, team: "EXTRANOS (LOS)", J: 15, G: 3, P: 7, N: 5, BP: 28, BC: 37, PTS: 14 },
-    { rank: 11, team: "TRICOTEUSES FC.", J: 15, G: 3, P: 9, N: 4, BP: 21, BC: 29, PTS: 13 },
-    { rank: 12, team: "BRUSSELS BRITISH R 4", J: 15, G: 2, P: 9, N: 4, BP: 19, BC: 40, PTS: 10 },
-    { rank: 13, team: "NEW INN FC 1", J: 14, G: 2, P: 9, N: 3, BP: 18, BC: 44, PTS: 9 },
-    { rank: 14, team: "ASTURIAS SPORTING", J: 0, G: 0, P: 0, N: 0, BP: 0, BC: 0, PTS: 0, excluded: true }
-  ];
+  
 
-  let matches = [
-    { day: 1, date: "2025-08-30", home: "IRLANDE FC 3", away: "GAST FC 1", homeScore: 3, awayScore: 3 },
-    { day: 1, date: "2025-08-30", home: "BRUSSELS BRITISH R 4", away: "CHIEFS WSL 2", homeScore: 1, awayScore: 0 },
-    { day: 1, date: "2025-08-30", home: "CHOULE AUDERGHEM 2", away: "TRICOTEUSES FC.", homeScore: 1, awayScore: 1 },
-    { day: 1, date: "2025-08-30", home: "CURTIS L'AUSELE", away: "MACCABI BXL", homeScore: 1, awayScore: 4 },
-    { day: 1, date: "2025-08-30", home: "NEW INN FC 1", away: "EXTRANOS (LOS)", homeScore: 1, awayScore: 2 },
-    { day: 1, date: "2025-08-30", home: "VOGELPIK FC.", away: "ITT - CLAUDY FC 1", homeScore: 0, awayScore: 2 },
+ let rankingData = [];   // ✅ maintenant c’est Firestore qui remplit
+let matches = [];       // ✅ maintenant c’est Firestore qui remplit
 
-    { day: 2, date: "2025-09-06", home: "ITT - CLAUDY FC 1", away: "BRUSSELS BRITISH R 4", homeScore: 2, awayScore: 5 },
-    { day: 2, date: "2025-09-06", home: "GAST FC 1", away: "VOGELPIK FC.", homeScore: 1, awayScore: 0 },
-    { day: 2, date: "2025-09-06", home: "EXTRANOS (LOS)", away: "IRLANDE FC 3", homeScore: 2, awayScore: 2 },
-    { day: 2, date: "2025-09-06", home: "MACCABI BXL", away: "NEW INN FC 1", homeScore: 5, awayScore: 0 },
-    { day: 2, date: "2025-09-06", home: "TRICOTEUSES FC.", away: "CURTIS L'AUSELE", homeScore: 1, awayScore: 3 },
-    { day: 2, date: "2025-09-06", home: "CHIEFS WSL 2", away: "SYB RFC", homeScore: 1, awayScore: 1 },
-
-    { day: 3, date: "2025-09-13", home: "IRLANDE FC 3", away: "MACCABI BXL", homeScore: 0, awayScore: 2 },
-    { day: 3, date: "2025-09-13", home: "GAST FC 1", away: "EXTRANOS (LOS)", homeScore: 0, awayScore: 1 },
-    { day: 3, date: "2025-09-13", home: "SYB RFC", away: "ITT - CLAUDY FC 1", homeScore: 3, awayScore: 0 },
-    { day: 3, date: "2025-09-13", home: "CHOULE AUDERGHEM 2", away: "CHIEFS WSL 2", homeScore: 5, awayScore: 2 },
-    { day: 3, date: "2025-09-13", home: "NEW INN FC 1", away: "TRICOTEUSES FC.", homeScore: 0, awayScore: 5, note: "FF-" },
-    { day: 3, date: "2025-09-13", home: "VOGELPIK FC.", away: "BRUSSELS BRITISH R 4", homeScore: 2, awayScore: 1 },
-
-    { day: 4, date: "2025-09-20", home: "ITT - CLAUDY FC 1", away: "CHOULE AUDERGHEM 2", homeScore: 2, awayScore: 2 },
-    { day: 4, date: "2025-09-20", home: "BRUSSELS BRITISH R 4", away: "SYB RFC", homeScore: 1, awayScore: 1 },
-    { day: 4, date: "2025-09-20", home: "EXTRANOS (LOS)", away: "VOGELPIK FC.", homeScore: 1, awayScore: 2 },
-    { day: 4, date: "2025-09-20", home: "MACCABI BXL", away: "GAST FC 1", homeScore: 2, awayScore: 3 },
-    { day: 4, date: "2025-09-20", home: "TRICOTEUSES FC.", away: "IRLANDE FC 3", homeScore: 2, awayScore: 2 },
-    { day: 4, date: "2025-09-20", home: "CHIEFS WSL 2", away: "CURTIS L'AUSELE", homeScore: 2, awayScore: 1 },
-
-    { day: 5, date: "2025-09-27", home: "GAST FC 1", away: "TRICOTEUSES FC.", homeScore: 2, awayScore: 1 },
-    { day: 5, date: "2025-09-27", home: "EXTRANOS (LOS)", away: "MACCABI BXL", homeScore: 4, awayScore: 4 },
-    { day: 5, date: "2025-09-27", home: "CHOULE AUDERGHEM 2", away: "BRUSSELS BRITISH R 4", homeScore: 3, awayScore: 0 },
-    { day: 5, date: "2025-09-27", home: "CURTIS L'AUSELE", away: "ITT - CLAUDY FC 1", homeScore: 4, awayScore: 0 },
-    { day: 5, date: "2025-09-27", home: "NEW INN FC 1", away: "CHIEFS WSL 2", homeScore: 4, awayScore: 4 },
-    { day: 5, date: "2025-09-27", home: "VOGELPIK FC.", away: "SYB RFC", homeScore: 2, awayScore: 1 },
-
-    { day: 6, date: "2025-10-04", home: "ITT - CLAUDY FC 1", away: "NEW INN FC 1", homeScore: 2, awayScore: 1 },
-    { day: 6, date: "2025-10-04", home: "BRUSSELS BRITISH R 4", away: "CURTIS L'AUSELE", homeScore: 1, awayScore: 6 },
-    { day: 6, date: "2025-10-04", home: "SYB RFC", away: "CHOULE AUDERGHEM 2", homeScore: 2, awayScore: 1 },
-    { day: 6, date: "2025-10-04", home: "MACCABI BXL", away: "VOGELPIK FC.", homeScore: 6, awayScore: 2 },
-    { day: 6, date: "2025-10-04", home: "TRICOTEUSES FC.", away: "EXTRANOS (LOS)", homeScore: 2, awayScore: 1 },
-    { day: 6, date: "2025-10-04", home: "CHIEFS WSL 2", away: "IRLANDE FC 3", homeScore: 6, awayScore: 4 },
-
-    { day: 7, date: "2025-10-11", home: "IRLANDE FC 3", away: "ITT - CLAUDY FC 1", homeScore: 2, awayScore: 1 },
-    { day: 7, date: "2025-10-11", home: "GAST FC 1", away: "CHIEFS WSL 2", homeScore: 2, awayScore: 3 },
-    { day: 7, date: "2025-10-11", home: "MACCABI BXL", away: "TRICOTEUSES FC.", homeScore: 2, awayScore: 0 },
-    { day: 7, date: "2025-10-11", home: "CURTIS L'AUSELE", away: "SYB RFC", homeScore: 2, awayScore: 1 },
-    { day: 7, date: "2025-10-11", home: "NEW INN FC 1", away: "BRUSSELS BRITISH R 4", homeScore: 2, awayScore: 0 },
-    { day: 7, date: "2025-10-11", home: "VOGELPIK FC.", away: "CHOULE AUDERGHEM 2", homeScore: 4, awayScore: 0 },
-
-    { day: 8, date: "2025-10-18", home: "ITT - CLAUDY FC 1", away: "GAST FC 1", homeScore: 4, awayScore: 2 },
-    { day: 8, date: "2025-10-18", home: "BRUSSELS BRITISH R 4", away: "IRLANDE FC 3", homeScore: 0, awayScore: 0 },
-    { day: 8, date: "2025-10-18", home: "SYB RFC", away: "NEW INN FC 1", homeScore: 2, awayScore: 0 },
-    { day: 8, date: "2025-10-18", home: "CHOULE AUDERGHEM 2", away: "CURTIS L'AUSELE", homeScore: 2, awayScore: 1 },
-    { day: 8, date: "2025-10-18", home: "TRICOTEUSES FC.", away: "VOGELPIK FC.", homeScore: 1, awayScore: 2 },
-    { day: 8, date: "2025-10-18", home: "CHIEFS WSL 2", away: "EXTRANOS (LOS)", homeScore: 2, awayScore: 2 },
-
-    { day: 9, date: "2025-10-25", home: "IRLANDE FC 3", away: "SYB RFC", homeScore: 1, awayScore: 0 },
-    { day: 9, date: "2025-10-25", home: "GAST FC 1", away: "BRUSSELS BRITISH R 4", homeScore: 4, awayScore: 3 },
-    { day: 9, date: "2025-10-25", home: "EXTRANOS (LOS)", away: "ITT - CLAUDY FC 1", homeScore: 8, awayScore: 3 },
-    { day: 9, date: "2025-10-25", home: "MACCABI BXL", away: "CHIEFS WSL 2", homeScore: 6, awayScore: 1 },
-    { day: 9, date: "2025-10-25", home: "NEW INN FC 1", away: "CHOULE AUDERGHEM 2", homeScore: 0, awayScore: 7 },
-    { day: 9, date: "2025-10-25", home: "VOGELPIK FC.", away: "CURTIS L'AUSELE", homeScore: 1, awayScore: 2 },
-
-    { day: 10, date: "2025-11-08", home: "ITT - CLAUDY FC 1", away: "MACCABI BXL", homeScore: 2, awayScore: 1 },
-    { day: 10, date: "2025-11-08", home: "BRUSSELS BRITISH R 4", away: "EXTRANOS (LOS)", note: "FF-FF" },
-    { day: 10, date: "2025-11-08", home: "SYB RFC", away: "GAST FC 1", homeScore: 0, awayScore: 1 },
-    { day: 10, date: "2025-11-08", home: "CHOULE AUDERGHEM 2", away: "IRLANDE FC 3", homeScore: 1, awayScore: 1 },
-    { day: 10, date: "2025-11-08", home: "CURTIS L'AUSELE", away: "NEW INN FC 1", homeScore: 6, awayScore: 0 },
-    { day: 10, date: "2025-11-08", home: "CHIEFS WSL 2", away: "TRICOTEUSES FC.", homeScore: 4, awayScore: 1 },
-
-    { day: 11, date: "2025-11-15", home: "IRLANDE FC 3", away: "CURTIS L'AUSELE", homeScore: 1, awayScore: 3 },
-    { day: 11, date: "2025-11-15", home: "GAST FC 1", away: "CHOULE AUDERGHEM 2", homeScore: 1, awayScore: 4 },
-    { day: 11, date: "2025-11-15", home: "EXTRANOS (LOS)", away: "SYB RFC", homeScore: 0, awayScore: 2 },
-    { day: 11, date: "2025-11-15", home: "MACCABI BXL", away: "BRUSSELS BRITISH R 4", homeScore: 3, awayScore: 0 },
-    { day: 11, date: "2025-11-15", home: "TRICOTEUSES FC.", away: "ITT - CLAUDY FC 1", homeScore: 2, awayScore: 1 },
-    { day: 11, date: "2025-11-15", home: "VOGELPIK FC.", away: "NEW INN FC 1", homeScore: 2, awayScore: 0 },
-
-    { day: 12, date: "2025-11-22", home: "BRUSSELS BRITISH R 4", away: "TRICOTEUSES FC.", homeScore: 1, awayScore: 1 },
-    { day: 12, date: "2025-11-22", home: "SYB RFC", away: "MACCABI BXL", homeScore: 4, awayScore: 2 },
-    { day: 12, date: "2025-11-22", home: "CHOULE AUDERGHEM 2", away: "EXTRANOS (LOS)", homeScore: 5, awayScore: 1 },
-    { day: 12, date: "2025-11-22", home: "CURTIS L'AUSELE", away: "GAST FC 1", homeScore: 6, awayScore: 0 },
-    { day: 12, date: "2025-11-22", home: "NEW INN FC 1", away: "IRLANDE FC 3", homeScore: 1, awayScore: 4 },
-    { day: 12, date: "2025-11-22", home: "VOGELPIK FC.", away: "CHIEFS WSL 2", homeScore: 3, awayScore: 3 },
-
-    { day: 13, date: "2025-11-29", home: "IRLANDE FC 3", away: "VOGELPIK FC.", homeScore: 0, awayScore: 1 },
-    { day: 13, date: "2025-11-29", home: "GAST FC 1", away: "NEW INN FC 1", homeScore: 3, awayScore: 3 },
-    { day: 13, date: "2025-11-29", home: "EXTRANOS (LOS)", away: "CURTIS L'AUSELE", homeScore: 1, awayScore: 3 },
-    { day: 13, date: "2025-11-29", home: "MACCABI BXL", away: "CHOULE AUDERGHEM 2", homeScore: 2, awayScore: 1 },
-    { day: 13, date: "2025-11-29", home: "TRICOTEUSES FC.", away: "SYB RFC", homeScore: 1, awayScore: 1 },
-    { day: 13, date: "2025-11-29", home: "CHIEFS WSL 2", away: "ITT - CLAUDY FC 1", homeScore: 4, awayScore: 1 },
-
-    { day: 14, date: "2025-12-06", home: "GAST FC 1", away: "IRLANDE FC 3", homeScore: 1, awayScore: 4 },
-    { day: 14, date: "2025-12-06", home: "CHIEFS WSL 2", away: "BRUSSELS BRITISH R 4", homeScore: 4, awayScore: 1 },
-    { day: 14, date: "2025-12-06", home: "TRICOTEUSES FC.", away: "CHOULE AUDERGHEM 2", homeScore: 2, awayScore: 3 },
-    { day: 14, date: "2025-12-06", home: "MACCABI BXL", away: "CURTIS L'AUSELE", homeScore: 4, awayScore: 0 },
-    { day: 14, date: "2025-12-06", home: "EXTRANOS (LOS)", away: "NEW INN FC 1", homeScore: 2, awayScore: 2 },
-    { day: 14, date: "2025-12-06", home: "ITT - CLAUDY FC 1", away: "VOGELPIK FC.", homeScore: 0, awayScore: 1 },
-
-    { day: 15, date: "2025-12-13", home: "BRUSSELS BRITISH R 4", away: "ITT - CLAUDY FC 1", homeScore: 3, awayScore: 3 },
-    { day: 15, date: "2025-12-13", home: "VOGELPIK FC.", away: "GAST FC 1", homeScore: 3, awayScore: 3 },
-    { day: 15, date: "2025-12-13", home: "IRLANDE FC 3", away: "EXTRANOS (LOS)", homeScore: 2, awayScore: 1 },
-    { day: 15, date: "2025-12-13", home: "NEW INN FC 1", away: "MACCABI BXL", homeScore: 4, awayScore: 0 },
-    { day: 15, date: "2025-12-13", home: "CURTIS L'AUSELE", away: "TRICOTEUSES FC.", homeScore: 3, awayScore: 1 },
-    { day: 15, date: "2025-12-13", home: "SYB RFC", away: "CHIEFS WSL 2", homeScore: 0, awayScore: 2 },
-
-    { day: 16, date: "2026-01-10", home: "MACCABI BXL", away: "IRLANDE FC 3" },
-    { day: 16, date: "2026-01-10", home: "EXTRANOS (LOS)", away: "GAST FC 1" },
-    { day: 16, date: "2026-01-10", home: "ITT - CLAUDY FC 1", away: "SYB RFC" },
-    { day: 16, date: "2026-01-10", home: "CHIEFS WSL 2", away: "CHOULE AUDERGHEM 2" },
-    { day: 16, date: "2026-01-10", home: "TRICOTEUSES FC.", away: "NEW INN FC 1" },
-    { day: 16, date: "2026-01-10", home: "BRUSSELS BRITISH R 4", away: "VOGELPIK FC." },
-
-    { day: 17, date: "2026-01-17", home: "CHOULE AUDERGHEM 2", away: "ITT - CLAUDY FC 1", homeScore: 3, awayScore: 3 },
-    { day: 17, date: "2026-01-17", home: "SYB RFC", away: "BRUSSELS BRITISH R 4", homeScore: 4, awayScore: 2 },
-    { day: 17, date: "2026-01-17", home: "VOGELPIK FC.", away: "EXTRANOS (LOS)", homeScore: 2, awayScore: 2 },
-    { day: 17, date: "2026-01-17", home: "GAST FC 1", away: "MACCABI BXL", homeScore: 0, awayScore: 5, note: "FF-" },
-    { day: 17, date: "2026-01-17", home: "IRLANDE FC 3", away: "TRICOTEUSES FC.", homeScore: 3, awayScore: 0 },
-    { day: 17, date: "2026-01-17", home: "CURTIS L'AUSELE", away: "CHIEFS WSL 2", homeScore: 1, awayScore: 4 },
-
-    { day: 18, date: "2026-01-24", home: "TRICOTEUSES FC.", away: "GAST FC 1" },
-    { day: 18, date: "2026-01-24", home: "MACCABI BXL", away: "EXTRANOS (LOS)" },
-    { day: 18, date: "2026-01-24", home: "BRUSSELS BRITISH R 4", away: "CHOULE AUDERGHEM 2" },
-    { day: 18, date: "2026-01-24", home: "ITT - CLAUDY FC 1", away: "CURTIS L'AUSELE" },
-    { day: 18, date: "2026-01-24", home: "CHIEFS WSL 2", away: "NEW INN FC 1" },
-    { day: 18, date: "2026-01-24", home: "SYB RFC", away: "VOGELPIK FC." },
-
-    { day: 19, date: "2026-01-31", home: "NEW INN FC 1", away: "ITT - CLAUDY FC 1", time: "15:30" },
-    { day: 19, date: "2026-01-31", home: "CURTIS L'AUSELE", away: "BRUSSELS BRITISH R 4", time: "14:00" },
-    { day: 19, date: "2026-01-31", home: "CHOULE AUDERGHEM 2", away: "SYB RFC", time: "12:30" },
-    { day: 19, date: "2026-01-31", home: "VOGELPIK FC.", away: "MACCABI BXL", time: "15:30" },
-    { day: 19, date: "2026-01-31", home: "EXTRANOS (LOS)", away: "TRICOTEUSES FC.", time: "15:30" },
-    { day: 19, date: "2026-01-31", home: "IRLANDE FC 3", away: "CHIEFS WSL 2", time: "12:30" },
-
-    { day: 20, date: "2026-02-07", home: "ITT - CLAUDY FC 1", away: "IRLANDE FC 3", time: "15:30" },
-    { day: 20, date: "2026-02-07", home: "CHIEFS WSL 2", away: "GAST FC 1", time: "15:30" },
-    { day: 20, date: "2026-02-07", home: "TRICOTEUSES FC.", away: "MACCABI BXL", time: "15:00" },
-    { day: 20, date: "2026-02-07", home: "SYB RFC", away: "CURTIS L'AUSELE", time: "15:30" },
-    { day: 20, date: "2026-02-07", home: "BRUSSELS BRITISH R 4", away: "NEW INN FC 1", time: "12:30" },
-    { day: 20, date: "2026-02-07", home: "CHOULE AUDERGHEM 2", away: "VOGELPIK FC.", time: "12:30" },
-
-    { day: 21, date: "2026-02-14", home: "GAST FC 1", away: "ITT - CLAUDY FC 1", time: "13:45" },
-    { day: 21, date: "2026-02-14", home: "IRLANDE FC 3", away: "BRUSSELS BRITISH R 4", time: "12:30" },
-    { day: 21, date: "2026-02-14", home: "NEW INN FC 1", away: "SYB RFC", time: "15:30" },
-    { day: 21, date: "2026-02-14", home: "CURTIS L'AUSELE", away: "CHOULE AUDERGHEM 2", time: "14:00" },
-    { day: 21, date: "2026-02-14", home: "VOGELPIK FC.", away: "TRICOTEUSES FC.", time: "15:30" },
-    { day: 21, date: "2026-02-14", home: "EXTRANOS (LOS)", away: "CHIEFS WSL 2", time: "15:30" },
-
-    { day: 22, date: "2026-02-21", home: "SYB RFC", away: "IRLANDE FC 3", time: "15:30" },
-    { day: 22, date: "2026-02-21", home: "BRUSSELS BRITISH R 4", away: "GAST FC 1", time: "12:30" },
-    { day: 22, date: "2026-02-21", home: "ITT - CLAUDY FC 1", away: "EXTRANOS (LOS)", time: "15:30" },
-    { day: 22, date: "2026-02-21", home: "CHIEFS WSL 2", away: "MACCABI BXL", time: "15:30" },
-    { day: 22, date: "2026-02-21", home: "CHOULE AUDERGHEM 2", away: "NEW INN FC 1", time: "12:30" },
-    { day: 22, date: "2026-02-21", home: "CURTIS L'AUSELE", away: "VOGELPIK FC.", time: "14:00" },
-
-    { day: 23, date: "2026-02-28", home: "MACCABI BXL", away: "ITT - CLAUDY FC 1", time: "14:00" },
-    { day: 23, date: "2026-02-28", home: "EXTRANOS (LOS)", away: "BRUSSELS BRITISH R 4", time: "15:30" },
-    { day: 23, date: "2026-02-28", home: "GAST FC 1", away: "SYB RFC", time: "13:45" },
-    { day: 23, date: "2026-02-28", home: "IRLANDE FC 3", away: "CHOULE AUDERGHEM 2", time: "12:30" },
-    { day: 23, date: "2026-02-28", home: "NEW INN FC 1", away: "CURTIS L'AUSELE", time: "15:30" },
-    { day: 23, date: "2026-02-28", home: "TRICOTEUSES FC.", away: "CHIEFS WSL 2", time: "15:00" },
-
-    { day: 24, date: "2026-03-07", home: "CURTIS L'AUSELE", away: "IRLANDE FC 3", time: "14:00" },
-    { day: 24, date: "2026-03-07", home: "CHOULE AUDERGHEM 2", away: "GAST FC 1", time: "12:30" },
-    { day: 24, date: "2026-03-07", home: "SYB RFC", away: "EXTRANOS (LOS)", time: "15:30" },
-    { day: 24, date: "2026-03-07", home: "BRUSSELS BRITISH R 4", away: "MACCABI BXL", time: "12:30" },
-    { day: 24, date: "2026-03-07", home: "ITT - CLAUDY FC 1", away: "TRICOTEUSES FC.", time: "15:30" },
-    { day: 24, date: "2026-03-07", home: "NEW INN FC 1", away: "VOGELPIK FC.", time: "15:30" },
-
-    { day: 25, date: "2026-03-14", home: "TRICOTEUSES FC.", away: "BRUSSELS BRITISH R 4", time: "15:00" },
-    { day: 25, date: "2026-03-14", home: "MACCABI BXL", away: "SYB RFC", time: "14:00" },
-    { day: 25, date: "2026-03-14", home: "EXTRANOS (LOS)", away: "CHOULE AUDERGHEM 2", time: "15:30" },
-    { day: 25, date: "2026-03-14", home: "GAST FC 1", away: "CURTIS L'AUSELE", time: "13:45" },
-    { day: 25, date: "2026-03-14", home: "IRLANDE FC 3", away: "NEW INN FC 1", time: "12:30" },
-    { day: 25, date: "2026-03-14", home: "CHIEFS WSL 2", away: "VOGELPIK FC.", time: "15:30" },
-
-    { day: 26, date: "2026-03-21", home: "VOGELPIK FC.", away: "IRLANDE FC 3", time: "15:30" },
-    { day: 26, date: "2026-03-21", home: "NEW INN FC 1", away: "GAST FC 1", time: "15:30" },
-    { day: 26, date: "2026-03-21", home: "CURTIS L'AUSELE", away: "EXTRANOS (LOS)", time: "14:00" },
-    { day: 26, date: "2026-03-21", home: "CHOULE AUDERGHEM 2", away: "MACCABI BXL", time: "12:30" },
-    { day: 26, date: "2026-03-21", home: "SYB RFC", away: "TRICOTEUSES FC.", time: "15:30" },
-    { day: 26, date: "2026-03-21", home: "ITT - CLAUDY FC 1", away: "CHIEFS WSL 2", time: "15:30" }
-  ];
   window.teamInfo = teamInfo;
-  window.rankingData = rankingData;
-  window.matches = matches;
+ window.rankingData = window.rankingData?.length ? window.rankingData : rankingData;
+window.matches = window.matches?.length ? window.matches : matches;
+
 
   // --- PROCHAIN MATCH (badge J-...) ---
 function setNextMatchBadge() {
@@ -1073,6 +884,37 @@ document.getElementById("playerInfo").innerHTML = `
     renderDay(Number(select.value));
   });
 }
+function renderNextMatchHero(){
+  const homeEl = document.getElementById("nmHome");
+  const awayEl = document.getElementById("nmAway");
+  const whenEl = document.getElementById("nmWhen");
+  const whereEl = document.getElementById("nmWhere");
+
+  const info = window.teamInfoByTeam?.[TEAM_NAME];
+  const next = info?.nextMatch;
+
+  if(!homeEl || !awayEl || !whenEl || !whereEl) return;
+
+  if(!next){
+    awayEl.textContent = "—";
+    whenEl.textContent = "—";
+    whereEl.textContent = "—";
+    return;
+  }
+
+  homeEl.textContent = next.home || TEAM_NAME;
+  awayEl.textContent = next.away || "—";
+
+  // Exemple: "Journée 01 du 30/08/2025"
+  // On transforme juste en texte lisible
+  whenEl.textContent = `${next.dayLabel || ""}${next.time ? " — " + next.time : ""}`.trim() || "—";
+
+  // adresse (ton script team-stats la met via team-addresses.json)
+  whereEl.textContent = next.address
+    ? `📍 ${next.address}`
+    : "📍 Adresse à venir";
+}
+
 
 
   renderPlayers();
@@ -1527,7 +1369,10 @@ rowWrap.style.gap = isWideLine ? "6px" : "10px";
   if (typeof window.renderRanking === "function") window.renderRanking();
   if (typeof window.renderMatches === "function") window.renderMatches();
   if (typeof window.setNextMatchBadge === "function") window.setNextMatchBadge();
+  if (typeof window.renderNextMatchHero === "function") window.renderNextMatchHero();
 }
+window.loadAbssaData = loadAbssaData;
+
 
 
 // on essaye de charger dès que possible
