@@ -504,7 +504,7 @@
   const TEAM_NAME = "NEW INN FC 1";
   const EXCLUDED_TEAM = "ASTURIAS SPORTING";
 
-  const teamInfo = {
+  let teamInfo = {
     goals: 18,
     conceded: 44,
     played: 14,
@@ -541,15 +541,15 @@
   { name: "Romain Marchal", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
   { name: "Ahmed Alouini", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
   { name: "Jodel Kaze Ntibarufata", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
-  { name: "Nolan", position: "Milieu / Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Nolan", position: "Milieu / Attaquant", goals: 0, assists: 0, played: 0, yellow: 1, red: 0 },
   { name: "Diego Gomez", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
-  { name: "Nolan", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
+  { name: "Nolan", position: "Attaquant", goals: 1, assists: 0, played: 0, yellow: 0, red: 0 },
   { name: "Kevin Corrales", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 },
   { name: "Mohammed Amine Amara", position: "Attaquant", goals: 0, assists: 0, played: 0, yellow: 0, red: 0 }
 ];
 
 
-  const rankingData = [
+  let rankingData = [
     { rank: 1, team: "MACCABI BXL", J: 15, G: 10, P: 4, N: 1, BP: 48, BC: 22, PTS: 31 },
     { rank: 2, team: "CURTIS L'AUSELE", J: 15, G: 10, P: 5, N: 0, BP: 42, BC: 23, PTS: 30 },
     { rank: 3, team: "CHIEFS WSL 2", J: 15, G: 8, P: 3, N: 4, BP: 42, BC: 33, PTS: 28 },
@@ -566,7 +566,7 @@
     { rank: 14, team: "ASTURIAS SPORTING", J: 0, G: 0, P: 0, N: 0, BP: 0, BC: 0, PTS: 0, excluded: true }
   ];
 
-  const matches = [
+  let matches = [
     { day: 1, date: "2025-08-30", home: "IRLANDE FC 3", away: "GAST FC 1", homeScore: 3, awayScore: 3 },
     { day: 1, date: "2025-08-30", home: "BRUSSELS BRITISH R 4", away: "CHIEFS WSL 2", homeScore: 1, awayScore: 0 },
     { day: 1, date: "2025-08-30", home: "CHOULE AUDERGHEM 2", away: "TRICOTEUSES FC.", homeScore: 1, awayScore: 1 },
@@ -749,29 +749,52 @@
     { day: 26, date: "2026-03-21", home: "SYB RFC", away: "TRICOTEUSES FC.", time: "15:30" },
     { day: 26, date: "2026-03-21", home: "ITT - CLAUDY FC 1", away: "CHIEFS WSL 2", time: "15:30" }
   ];
-  // --- PROCHAIN MATCH (badge J-...) ---
-function setNextMatchBadge(){
-  const badge = document.getElementById("nmBadge");
-  if(!badge) return;
+  window.teamInfo = teamInfo;
+  window.rankingData = rankingData;
+  window.matches = matches;
 
-  // Match : 24/01/2026 15:30
-  const next = new Date("2026-01-24T15:30:00");
+  // --- PROCHAIN MATCH (badge J-...) ---
+function setNextMatchBadge() {
+  const badge = document.getElementById("nmBadge");
+  if (!badge) return;
+
+  const info = window.teamInfoByTeam?.[TEAM_NAME];
+  const next = info?.nextMatch;
+
+  if (!next || !next.dayLabel) {
+    badge.textContent = "—";
+    return;
+  }
+
+  // dayLabel ressemble à "Journée 01 du 30/08/2025"
+  const m = next.dayLabel.match(/du\s+(\d{2})\/(\d{2})\/(\d{4})/);
+  if (!m) {
+    badge.textContent = "—";
+    return;
+  }
+
+  const dd = Number(m[1]);
+  const mm = Number(m[2]) - 1;
+  const yyyy = Number(m[3]);
+
+  // heure (si dispo)
+  let hh = 0, min = 0;
+  if (next.time && /^\d{2}:\d{2}$/.test(next.time)) {
+    hh = Number(next.time.slice(0, 2));
+    min = Number(next.time.slice(3, 5));
+  }
+
+  const matchDate = new Date(yyyy, mm, dd, hh, min);
   const now = new Date();
 
   const dayMs = 1000 * 60 * 60 * 24;
-
-  // On compare uniquement les dates (à minuit), pas les heures
   const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const matchMid = new Date(next.getFullYear(), next.getMonth(), next.getDate());
-
+  const matchMid = new Date(matchDate.getFullYear(), matchDate.getMonth(), matchDate.getDate());
   const diffDays = Math.round((matchMid - todayMid) / dayMs);
 
-  if (diffDays >= 0) {
-    badge.textContent = `J-${diffDays}`; // demain => J-1, aujourd'hui => J-0
-  } else {
-    badge.textContent = `J+${Math.abs(diffDays)}`;
-  }
+  badge.textContent = diffDays >= 0 ? `J-${diffDays}` : `J+${Math.abs(diffDays)}`;
 }
+
 
   function goTo(id){
     document.getElementById(id).scrollIntoView({behavior:"smooth"});
@@ -872,55 +895,81 @@ document.getElementById("playerInfo").innerHTML = `
     grid.appendChild(card);
   });
 }
+  function getTeamFromRanking(teamName) {
+  const t = (teamName || "").trim().toUpperCase();
+  return (window.rankingData || []).find(r => (r.team || "").trim().toUpperCase() === t) || null;
+}
 
 
-  function renderStats(){
+  function renderStats() {
   const boxes = document.getElementById("statsBoxes");
+  if (!boxes) return;
+
+  // 1) On récupère la ligne du classement pour NEW INN
+  const row = (window.rankingData || []).find(
+    r => (r.team || "").toUpperCase() === TEAM_NAME.toUpperCase()
+  );
+
+  // fallback si pas trouvé
+  const played = row?.J ?? 0;
+  const wins = row?.G ?? 0;
+  const draws = row?.N ?? 0;
+  const losses = row?.P ?? 0;
+
+  const goalsFor = row?.M ?? 0;
+  const goalsAgainst = row?.E ?? 0;
+
+  const record = `${wins}V-${draws}N-${losses}D`;
+
   boxes.innerHTML = `
     <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
       <p class="text-xs text-white/60">Matchs joués</p>
-      <p class="text-2xl font-black mt-1">${teamInfo.played}</p>
+      <p class="text-2xl font-black mt-1">${played}</p>
     </div>
     <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
       <p class="text-xs text-white/60">Buts marqués</p>
-      <p class="text-2xl font-black mt-1">${teamInfo.goals}</p>
+      <p class="text-2xl font-black mt-1">${goalsFor}</p>
     </div>
     <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
       <p class="text-xs text-white/60">Buts encaissés</p>
-      <p class="text-2xl font-black mt-1">${teamInfo.conceded}</p>
+      <p class="text-2xl font-black mt-1">${goalsAgainst}</p>
     </div>
     <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
       <p class="text-xs text-white/60">Bilan</p>
-      <p class="text-2xl font-black mt-1">${teamInfo.record}</p>
+      <p class="text-2xl font-black mt-1">${record}</p>
     </div>
   `;
 
+  // ✅ tes “chips” desktop/mobile en haut
   const tg = document.getElementById("teamGoals");
   const tc = document.getElementById("teamConceded");
   const tp = document.getElementById("teamPlayed");
   const tr = document.getElementById("teamRecord");
 
-  if(tg) tg.textContent = teamInfo.goals;
-  if(tc) tc.textContent = teamInfo.conceded;
-  if(tp) tp.textContent = teamInfo.played;
-  if(tr) tr.textContent = teamInfo.record;
+  if (tg) tg.textContent = goalsFor;
+  if (tc) tc.textContent = goalsAgainst;
+  if (tp) tp.textContent = played;
+  if (tr) tr.textContent = record;
+
   const tgm = document.getElementById("teamGoalsMobile");
-const tcm = document.getElementById("teamConcededMobile");
-const tpm = document.getElementById("teamPlayedMobile");
-const trm = document.getElementById("teamRecordMobile");
+  const tcm = document.getElementById("teamConcededMobile");
+  const tpm = document.getElementById("teamPlayedMobile");
+  const trm = document.getElementById("teamRecordMobile");
 
-if(tgm) tgm.textContent = teamInfo.goals;
-if(tcm) tcm.textContent = teamInfo.conceded;
-if(tpm) tpm.textContent = teamInfo.played;
-if(trm) trm.textContent = teamInfo.record;
+  if (tgm) tgm.textContent = goalsFor;
+  if (tcm) tcm.textContent = goalsAgainst;
+  if (tpm) tpm.textContent = played;
+  if (trm) trm.textContent = record;
+}
 
- } 
 
+    function renderRanking(){
+  const body = document.getElementById("rankingBody");
+  if(!body) return;
+  body.innerHTML = "";
 
-  function renderRanking(){
-    const body = document.getElementById("rankingBody");
-    if(!body) return;
-    body.innerHTML = "";
+  const rankingData = window.rankingData || []; // ✅ AJOUT
+
 
     rankingData.forEach(row => {
       const isUs = row.team.toUpperCase() === TEAM_NAME.toUpperCase();
@@ -941,9 +990,9 @@ if(trm) trm.textContent = teamInfo.record;
   <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.G}</td>
   <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.P}</td>
   <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.N}</td>
-  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BP}</td>
-  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BC}</td>
-  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.PTS}</td>
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BP ?? row.M ?? 0}</td>
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.BC ?? row.E ?? 0}</td>
+  <td class="px-4 py-3 text-right ${isUs ? "font-black text-red-200" : "text-white/70"}">${row.PTS ?? row.points ?? 0}</td>
 `;
 
 
@@ -955,6 +1004,7 @@ if(trm) trm.textContent = teamInfo.record;
   const container = document.getElementById("matchesList");
   const select = document.getElementById("daySelect");
   if(!container || !select) return;
+  const matches = window.matches || []; // ✅ AJOUT
 
   const days = [...new Set(matches.map(m => m.day))].sort((a,b)=>a-b);
 
@@ -1461,6 +1511,27 @@ rowWrap.style.gap = isWideLine ? "6px" : "10px";
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+ async function loadAbssaData() {
+  const snap = await getDoc(doc(db, "abssa", "div3a"));
+  if (!snap.exists()) return;
+
+  const data = snap.data() || {};
+
+  // ✅ Firestore -> variables globales
+  if (data.teamInfoByTeam) window.teamInfoByTeam = data.teamInfoByTeam; // <-- AJOUT IMPORTANT
+  if (data.rankingData) window.rankingData = data.rankingData;
+  if (data.matches) window.matches = data.matches;
+
+  // ✅ relance les rendus
+  if (typeof window.renderStats === "function") window.renderStats();
+  if (typeof window.renderRanking === "function") window.renderRanking();
+  if (typeof window.renderMatches === "function") window.renderMatches();
+  if (typeof window.setNextMatchBadge === "function") window.setNextMatchBadge();
+}
+
+
+// on essaye de charger dès que possible
+loadAbssaData();
 
   const navTraining = document.getElementById("navTraining");
   const navTrainingMobile = document.getElementById("navTrainingMobile");
